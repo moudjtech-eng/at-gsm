@@ -1,0 +1,68 @@
+<%- include('../partials/header') %>
+<h1 class="text-3xl font-bold mb-6">Tableau de Bord Financier</h1>
+
+<!-- CARTES DE STATISTIQUES -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-slate-500 text-xs uppercase font-bold mb-1">Revenus du Mois</p>
+    <p class="text-3xl font-extrabold text-green-600"><%= revenueThisMonth.toLocaleString('fr-FR') %> FCFA</p>
+  </div>
+  
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-slate-500 text-xs uppercase font-bold mb-1">Total Encaissé (Global)</p>
+    <p class="text-3xl font-extrabold text-blue-600"><%= totalRevenue.toLocaleString('fr-FR') %> FCFA</p>
+  </div>
+  
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-slate-500 text-xs uppercase font-bold mb-1">Dettes en Cours (À recouvrer)</p>
+    <p class="text-3xl font-extrabold text-red-600"><%= totalDebt.toLocaleString('fr-FR') %> FCFA</p>
+  </div>
+</div>
+
+<!-- LISTE DES MAUVAIS PAYEURS -->
+<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+  <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+    <h2 class="text-xl font-bold text-slate-800">Membres en retard de paiement</h2>
+    <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full"><%= debtors.length %> membre(s) concerné(s)</span>
+  </div>
+  
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm min-w-[700px]">
+      <thead class="bg-slate-50"><tr>
+        <th class="px-6 py-4 text-left font-semibold text-slate-600">Membre</th>
+        <th class="px-6 py-4 text-left font-semibold text-slate-600">Contact</th>
+        <th class="px-6 py-4 text-left font-semibold text-slate-600">Retard</th>
+        <th class="px-6 py-4 text-right font-semibold text-slate-600">Action</th>
+      </tr></thead>
+      <tbody class="divide-y divide-slate-100">
+        <% if (!debtors.length) { %>
+          <tr><td colspan="4" class="px-6 py-10 text-center text-green-600 font-bold">Tous les membres sont à jour ! 🎉</td></tr>
+        <% } %>
+        <% debtors.forEach(d => { %>
+          <tr>
+            <td class="px-6 py-4 font-medium"><%= d.name %></td>
+            <td class="px-6 py-4">
+              <p class="text-slate-700"><%= d.phone %></p>
+              <p class="text-xs text-slate-500"><%= d.email %></p>
+            </td>
+            <td class="px-6 py-4">
+              <span class="px-2 py-1 bg-red-100 text-red-700 text-[10px] font-bold rounded-full uppercase">
+                <%= d.debt_months %> mois (<%= (d.debt_months * 500).toLocaleString('fr-FR') %> FCFA)
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <!-- FORMULAIRE DE RELANCE PAR EMAIL -->
+              <form action="/admin/finances/remind/<%= d.id %>" method="POST" onsubmit="return confirm('Envoyer un email de relance à <%= d.name %> ?')" class="inline">
+                <button type="submit" class="bg-red-50 text-red-700 px-3 py-2 rounded-lg font-bold text-xs hover:bg-red-100 transition-colors flex items-center gap-2 ml-auto">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                  Relancer par Email
+                </button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- include('../partials/footer') %>

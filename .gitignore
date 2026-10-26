@@ -1,0 +1,4 @@
+node_modules/
+.env
+db/atgsm.db
+public/uploads/

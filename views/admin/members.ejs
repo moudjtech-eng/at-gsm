@@ -1,0 +1,156 @@
+<%- include('../partials/header') %>
+<h1 class="text-3xl font-bold mb-6">Gestion des Membres & Admins</h1>
+
+<div class="bg-white p-6 rounded-2xl border shadow-sm mb-6">
+  <h2 class="text-lg font-bold mb-4">➕ Ajouter un utilisateur</h2>
+  <form action="/admin/members" method="POST" class="grid grid-cols-1 md:grid-cols-6 gap-3">
+    <input name="name" placeholder="Nom" required class="px-4 py-2 border rounded-lg">
+    <input name="phone" placeholder="Téléphone" required class="px-4 py-2 border rounded-lg">
+    <input name="email" type="email" placeholder="Email" required class="px-4 py-2 border rounded-lg">
+    <input name="password" placeholder="Mot de passe (min 6)" required minlength="6" class="px-4 py-2 border rounded-lg font-mono">
+    <select name="role" class="px-4 py-2 border rounded-lg bg-slate-50">
+      <option value="member">Membre Simple</option>
+      <option value="admin">Administrateur</option>
+    </select>
+    <div class="flex gap-2">
+      <input name="debt" type="number" value="0" placeholder="Dette" class="flex-1 px-4 py-2 border rounded-lg w-16" title="Positif = Retard, Négatif = Avance">
+      <button class="bg-primary text-white px-4 py-2 rounded-lg font-bold">OK</button>
+    </div>
+  </form>
+</div>
+
+<div class="bg-white rounded-2xl border shadow-sm overflow-x-auto">
+  <table class="w-full text-sm min-w-[900px]">
+    <thead class="bg-slate-50"><tr>
+      <th class="px-4 py-3 text-left">Nom</th>
+      <th class="px-4 py-3 text-left">Email</th>
+      <th class="px-4 py-3 text-left">Rôle</th>
+      <th class="px-4 py-3 text-left">Statut</th>
+      <th class="px-4 py-3 text-left">Cotisations</th>
+      <th class="px-4 py-3 text-right">Actions</th>
+    </tr></thead>
+    <tbody class="divide-y">
+      <% members.forEach(m => { %>
+        <tr>
+          <td class="px-4 py-3 font-medium"><%= m.name || 'Administrateur' %></td>
+          <td class="px-4 py-3 text-slate-600"><%= m.email %></td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase <%= m.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700' %>">
+              <%= m.role %>
+            </span>
+          </td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase <%= m.user_status === 'actif' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' %>">
+              <%= m.user_status %>
+            </span>
+          </td>
+          
+          <!-- NOUVELLE COLONNE DE GESTION DES COTISATIONS -->
+          <td class="px-4 py-3">
+            <% if (m.role === 'member' && m.member_id) { %>
+              <div class="flex flex-col gap-1 items-start">
+                <!-- Affichage clair du statut -->
+                <% if (m.debt_months > 0) { %>
+                  <span class="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded-full"><%= m.debt_months %> mois de retard</span>
+                <% } else if (m.debt_months < 0) { %>
+                  <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-full"><%= Math.abs(m.debt_months) %> mois d'avance</span>
+                <% } else { %>
+                  <span class="px-2 py-0.5 bg-slate-100 text-slate-700 text-[10px] font-bold rounded-full">À jour</span>
+                <% } %>
+                
+                <!-- Le champ pour modifier la dette (sans min="0" pour autoriser le négatif) -->
+                <form action="/admin/members/<%= m.member_id %>/debt" method="POST" class="flex items-center gap-1 mt-1">
+                  <input name="debt" type="number" value="<%= m.debt_months || 0 %>" class="w-16 px-2 py-1 border rounded text-xs text-center" title="Positif = Retard, Négatif = Avance">
+                  <button class="text-primary text-xs font-bold" title="Mettre à jour">✓</button>
+                </form>
+              </div>
+            <% } else { %> — <% } %>
+          </td>
+          
+          <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+            <% if (m.role === 'member') { %>
+              <button 
+                data-id="<%= m.member_id %>" 
+                data-name="<%= m.name || '' %>" 
+                data-phone="<%= m.phone || '' %>" 
+                data-spec="<%= m.spec || '' %>" 
+                data-email="<%= m.email %>" 
+                onclick="openEditFromBtn(this)" 
+                class="text-primary hover:underline text-xs font-semibold">
+                Éditer
+              </button>
+            <% } %>
+            <button 
+              data-id="<%= m.user_id %>" 
+              data-name="<%= m.name || 'Administrateur' %>" 
+              onclick="openResetFromBtn(this)" 
+              class="text-yellow-600 hover:underline text-xs font-semibold">
+              MDP
+            </button>
+            <form action="/admin/users/<%= m.user_id %>/toggle" method="POST" class="inline">
+              <button class="text-red-600 hover:underline text-xs font-semibold">
+                <%= m.user_status === 'actif' ? 'Suspendre' : 'Réactiver' %>
+              </button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modals -->
+<div id="edit-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60">
+  <div class="bg-white rounded-2xl p-6 w-full max-w-md space-y-3">
+    <h3 class="text-xl font-bold">Modifier le membre</h3>
+    <form id="edit-form" method="POST" class="space-y-3">
+      <input name="name" placeholder="Nom" required class="w-full px-4 py-2 border rounded-lg">
+      <input name="phone" placeholder="Téléphone" class="w-full px-4 py-2 border rounded-lg">
+      <input name="spec" placeholder="Spécialisation" class="w-full px-4 py-2 border rounded-lg">
+      <input name="email" type="email" placeholder="Email" required class="w-full px-4 py-2 border rounded-lg">
+      <div class="flex gap-2">
+        <button type="button" onclick="document.getElementById('edit-modal').classList.add('hidden')" class="flex-1 py-2 bg-slate-200 rounded-lg font-bold">Annuler</button>
+        <button type="submit" class="flex-1 py-2 bg-primary text-white rounded-lg font-bold">Sauvegarder</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="reset-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60">
+  <div class="bg-white rounded-2xl p-6 w-full max-w-md space-y-3">
+    <h3 class="text-xl font-bold">Réinitialiser le mot de passe</h3>
+    <p class="text-sm text-slate-500" id="reset-name"></p>
+    <form id="reset-form" method="POST" class="space-y-3">
+      <input name="password" placeholder="Nouveau mot de passe (min 6)" required minlength="6" class="w-full px-4 py-2 border rounded-lg font-mono">
+      <div class="flex gap-2">
+        <button type="button" onclick="document.getElementById('reset-modal').classList.add('hidden')" class="flex-1 py-2 bg-slate-200 rounded-lg font-bold">Annuler</button>
+        <button type="submit" class="flex-1 py-2 bg-primary text-white rounded-lg font-bold">Réinitialiser</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openEditFromBtn(btn) {
+  const m = document.getElementById('edit-modal');
+  m.classList.remove('hidden'); 
+  m.classList.add('flex');
+  
+  const form = document.getElementById('edit-form');
+  form.action = '/admin/members/' + btn.dataset.id;
+  form.querySelector('[name="name"]').value = btn.dataset.name;
+  form.querySelector('[name="phone"]').value = btn.dataset.phone;
+  form.querySelector('[name="spec"]').value = btn.dataset.spec;
+  form.querySelector('[name="email"]').value = btn.dataset.email;
+}
+
+function openResetFromBtn(btn) {
+  const m = document.getElementById('reset-modal');
+  m.classList.remove('hidden'); 
+  m.classList.add('flex');
+  
+  document.getElementById('reset-form').action = '/admin/users/' + btn.dataset.id + '/password';
+  document.getElementById('reset-name').innerText = 'Utilisateur : ' + btn.dataset.name;
+}
+</script>
+<%- include('../partials/footer') %>

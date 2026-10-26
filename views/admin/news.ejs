@@ -1,0 +1,27 @@
+<%- include('../partials/header') %>
+<h1 class="text-3xl font-bold mb-6">Actualités & Projets</h1>
+<div class="bg-white p-6 rounded-2xl border shadow-sm mb-6">
+  <h2 class="text-lg font-bold mb-4">➕ Publier une annonce</h2>
+  <form action="/admin/news" method="POST" enctype="multipart/form-data" class="space-y-3">
+    <input name="title" placeholder="Titre" required class="w-full px-4 py-2 border rounded-lg">
+    <select name="category" required class="w-full px-4 py-2 border rounded-lg">
+      <option>Formation</option><option>Investissement</option><option>Communauté</option><option>Nouvelles Officielles</option>
+    </select>
+    <textarea name="content" rows="4" placeholder="Contenu" required class="w-full px-4 py-2 border rounded-lg"></textarea>
+    <input type="file" name="image" accept="image/*" class="w-full px-4 py-2 border rounded-lg">
+    <button class="bg-primary text-white px-6 py-2 rounded-lg font-bold">Publier</button>
+  </form>
+</div>
+<div class="space-y-3">
+  <% news.forEach(n => { %>
+    <div class="bg-white p-6 rounded-2xl border shadow-sm flex justify-between items-start">
+      <div>
+        <span class="text-xs font-bold uppercase px-2 py-0.5 bg-slate-100 rounded"><%= n.category %></span>
+        <h3 class="text-lg font-bold mt-2"><%= n.title %></h3>
+        <p class="text-slate-600 text-sm mt-1"><%= n.content %></p>
+      </div>
+      <form action="/admin/news/<%= n.id %>/delete" method="POST" onsubmit="return confirm('Supprimer ?')"><button class="text-red-600 hover:underline text-sm font-bold">Supprimer</button></form>
+    </div>
+  <% }) %>
+</div>
+<%- include('../partials/footer') %>

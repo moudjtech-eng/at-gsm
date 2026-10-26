@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Facture #<%= payment.ref %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 p-8 font-sans">
+  <div class="max-w-2xl mx-auto bg-white p-10 rounded-2xl shadow-xl">
+    <div class="flex justify-between items-start border-b pb-6 mb-6">
+      <div>
+        <h1 class="text-3xl font-black text-slate-800">AT-GSM <span class="text-red-600">Bohicon</span></h1>
+        <p class="text-sm text-slate-500">Association des Techniciens GSM</p>
+      </div>
+      <div class="text-right">
+        <p class="text-xs text-slate-400 uppercase font-bold">Reçu de paiement</p>
+        <p class="font-mono font-bold text-lg">#<%= payment.ref %></p>
+        <p class="text-sm text-slate-500"><%= new Date(payment.created_at).toLocaleDateString('fr-FR') %></p>
+      </div>
+    </div>
+    
+    <div class="mb-8">
+      <h2 class="text-sm font-bold text-slate-400 uppercase mb-2">Facturé à :</h2>
+      <p class="font-bold text-lg"><%= member.name %></p>
+      <p class="text-slate-600"><%= member.spec %></p>
+    </div>
+    
+    <table class="w-full mb-8 border-collapse">
+      <thead>
+        <tr class="bg-slate-50 text-left">
+          <th class="p-3 border-b">Désignation</th>
+          <th class="p-3 border-b text-center">Mois</th>
+          <th class="p-3 border-b text-right">Montant</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="p-3 border-b">Cotisation AT-GSM</td>
+          <td class="p-3 border-b text-center"><%= payment.months %></td>
+          <td class="p-3 border-b text-right"><%= payment.amount.toLocaleString('fr-FR') %> FCFA</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2" class="p-3 text-right font-bold">Total :</td>
+          <td class="p-3 text-right font-black text-lg"><%= payment.amount.toLocaleString('fr-FR') %> FCFA</td>
+        </tr>
+      </tfoot>
+    </table>
+    
+    <div class="text-center p-4 rounded-xl border-2 border-dashed <%= payment.status === 'validated' ? 'border-green-500 text-green-700 bg-green-50' : 'border-yellow-500 text-yellow-700 bg-yellow-50' %>">
+      <p class="font-bold uppercase">
+        <%= payment.status === 'validated' ? '✅ Paiement validé par l\'administration' : '⏳ En attente de validation par l\'administration' %>
+      </p>
+    </div>
+
+    <div class="mt-10 text-center">
+      <button onclick="window.print()" class="bg-slate-800 text-white px-6 py-2 rounded-lg font-bold hover:bg-slate-700">Imprimer / PDF</button>
+    </div>
+  </div>
+</body>
+</html>

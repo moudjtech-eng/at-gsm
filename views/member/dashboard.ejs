@@ -1,0 +1,198 @@
+<%- include('../partials/header') %>
+
+<div class="flex justify-between items-center mb-8">
+  <h1 class="text-3xl font-bold">Tableau de Bord</h1>
+  <a href="/member/profile" class="bg-dark text-white px-4 py-2 rounded-lg font-bold hover:bg-slate-800">Modifier Profil</a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <!-- CARTE DU MEMBRE -->
+  <div>
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+      <div class="h-24 w-24 rounded-full bg-slate-200 mx-auto mb-4 overflow-hidden">
+        <% if (member.photo_path) { %>
+          <img src="/uploads/<%= member.photo_path %>" class="w-full h-full object-cover">
+        <% } else { %>
+          <div class="w-full h-full flex items-center justify-center text-slate-400 font-bold text-3xl"><%= member.name.charAt(0) %></div>
+        <% } %>
+      </div>
+      <h3 class="text-xl font-bold"><%= member.name %></h3>
+      <p class="text-slate-500 text-sm mb-4"><%= member.spec %></p>
+      
+      <!-- LOGIQUE D'AFFICHAGE DETTE / AVANCE -->
+      <div class="p-3 bg-slate-50 rounded-lg text-left">
+        <% if (member.debt_months > 0) { %>
+          <p class="text-[10px] uppercase text-slate-400 font-bold">Solde dû</p>
+          <p class="text-2xl font-extrabold text-red-600"><%= balance.toLocaleString('fr-FR') %> FCFA</p>
+          <p class="text-xs text-red-500 font-medium"><%= member.debt_months %> mois de retard</p>
+        <% } else if (member.debt_months < 0) { %>
+          <p class="text-[10px] uppercase text-slate-400 font-bold">Crédit (Mois d'avance)</p>
+          <p class="text-2xl font-extrabold text-green-600"><%= Math.abs(balance).toLocaleString('fr-FR') %> FCFA</p>
+          <p class="text-xs text-green-600 font-medium"><%= Math.abs(member.debt_months) %> mois d'avance</p>
+        <% } else { %>
+          <p class="text-[10px] uppercase text-slate-400 font-bold">Statut</p>
+          <p class="text-2xl font-extrabold text-green-600">À jour</p>
+          <p class="text-xs text-green-600 font-medium">Aucun retard</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- DÉTAILS ET PAIEMENT -->
+  <div class="lg:col-span-2 space-y-6">
+    
+    <!-- ZONE DE PAIEMENT KKIAPAY -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <h2 class="text-xl font-bold mb-4">Payer mes cotisations</h2>
+      
+      <!-- ON AFFICHE TOUJOURS LE PAIEMENT MAINTENANT -->
+      <div class="flex flex-col md:flex-row gap-3 items-center">
+        <select id="months-select" class="px-4 py-3 border border-slate-300 rounded-lg flex-1 w-full bg-slate-50 font-medium">
+          <!-- On propose jusqu'à 12 mois, ou plus si la dette est élevée -->
+          <% let maxMonths = Math.max(12, member.debt_months + 12); %>
+          <% for (let i = 1; i <= maxMonths; i++) { %>
+            <option value="<%= i %>"><%= i %> mois — <%= (i * MONTHLY_FEE).toLocaleString('fr-FR') %> FCFA</option>
+          <% } %>
+        </select>
+        
+        <button id="btn-payer" class="bg-[#00b0ff] hover:bg-[#0091ea] text-white px-6 py-3 rounded-lg font-bold w-full md:w-auto shadow-md flex items-center justify-center gap-2 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+          Payer via Mobile Money
+        </button>
+      </div>
+      <p class="text-xs text-slate-500 mt-3">💡 Vous pouvez payer par anticipation pour les mois à venir.</p>
+    </div>
+
+    <!-- HISTORIQUE DES COTISATIONS -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <h2 class="text-xl font-bold mb-4">Historique</h2>
+      <% if (!contributions.length) { %>
+        <p class="text-slate-500 italic text-sm">Aucune contribution enregistrée.</p>
+      <% } else { %>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-slate-400 border-b border-slate-200">
+                <th class="pb-2 text-left">Mois</th>
+                <th class="pb-2 text-left">Année</th>
+                <th class="pb-2 text-left">Statut</th>
+                <th class="pb-2 text-left">Montant</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% contributions.forEach(c => { %>
+                <tr class="border-b border-slate-50">
+                  <td class="py-3"><%= c.month %></td>
+                  <td class="py-3"><%= c.year %></td>
+                  <td class="py-3">
+                    <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase <%= c.status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' %>">
+                      <%= c.status === 'paid' ? 'Payé' : 'En attente' %>
+                    </span>
+                  </td>
+                  <td class="py-3 font-semibold"><%= c.amount.toLocaleString('fr-FR') %> FCFA</td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- REÇUS DE PAIEMENT -->
+    <% if (payments.length) { %>
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <h2 class="text-xl font-bold mb-4">Mes reçus & demandes</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-slate-400 border-b border-slate-200">
+                <th class="pb-2 text-left">Réf</th>
+                <th class="pb-2 text-left">Montant</th>
+                <th class="pb-2 text-left">Statut</th>
+                <th class="pb-2 text-right">Facture</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% payments.forEach(p => { %>
+                <tr class="border-b border-slate-50">
+                  <td class="py-3 font-mono text-xs text-slate-600">#<%= p.ref %></td>
+                  <td class="py-3 font-semibold"><%= p.amount.toLocaleString('fr-FR') %> FCFA</td>
+                  <td class="py-3 text-xs font-bold">
+                    <%= p.status === 'pending' ? '⏳ En attente' : p.status === 'validated' ? '✅ Validé' : '❌ Rejeté' %>
+                  </td>
+                  <td class="py-3 text-right">
+                    <a href="/member/receipt/<%= p.ref %>" target="_blank" class="bg-slate-100 text-slate-700 px-3 py-1 rounded font-bold text-xs hover:bg-slate-200 transition-colors">Télécharger</a>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Données passées au JavaScript sans casser l'éditeur -->
+<div id="payment-data" 
+     data-fee="<%= MONTHLY_FEE %>" 
+     data-key="<%= process.env.KKIA_PUBLIC_KEY || '' %>" 
+     class="hidden">
+</div>
+
+<!-- SCRIPT KKIAPAY -->
+<script>
+  const paymentData = document.getElementById("payment-data");
+  const KKIAPAY_PUBLIC_KEY = paymentData.dataset.key;
+  const MONTHLY_FEE = parseInt(paymentData.dataset.fee);
+  
+  let moisSelectionnes = 1;
+  const btnPayer = document.getElementById("btn-payer");
+  
+  if (btnPayer) {
+    btnPayer.addEventListener("click", (e) => {
+      e.preventDefault();
+      moisSelectionnes = parseInt(document.getElementById("months-select").value);
+      const montantTotal = moisSelectionnes * MONTHLY_FEE;
+
+      openKkiapayWidget({
+        amount: montantTotal,
+        key: KKIAPAY_PUBLIC_KEY,
+        position: "center",
+        theme: "#dc2626",
+        sandbox: true // ⚠️ Passe à "false" pour la production (vrai argent)
+      });
+    });
+  }
+
+    addKkiapayListener("success", async (response) => {
+    console.log("Paiement réussi côté widget, attente de validation...");
+    
+    // On attend 3 secondes que KkiaPay confirme côté serveur
+    setTimeout(async () => {
+      try {
+        const res = await fetch('/member/pay-kkiapay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ transactionId: response.transactionId, months: moisSelectionnes })
+        });
+        const data = await res.json();
+        
+        if(data.success) {
+          alert("Paiement vérifié et validé avec succès !");
+          window.location.reload();
+        } else {
+          alert("Erreur : " + data.message);
+        }
+      } catch (err) {
+        alert("Erreur réseau. Veuillez contacter l'administrateur.");
+      }
+    }, 3000); // 3000 millisecondes = 3 secondes
+  });
+
+  addKkiapayListener("failed", (error) => {
+    alert("Le paiement a échoué ou a été annulé.");
+  });
+</script>
+
+<%- include('../partials/footer') %>

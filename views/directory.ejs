@@ -1,0 +1,57 @@
+<%- include('partials/header') %>
+<div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+  <div>
+    <h1 class="text-3xl font-bold">Techniciens Certifiés</h1>
+    <p class="text-slate-600">Trouvez un professionnel vérifié à Bohicon.</p>
+  </div>
+  <form action="/directory" method="GET" class="flex">
+    <input type="text" name="q" value="<%= q %>" placeholder="Rechercher..." class="px-4 py-2 border border-slate-300 rounded-l-lg focus:outline-none">
+    <button class="bg-primary text-white px-4 py-2 rounded-r-lg font-bold hover:bg-red-700">Chercher</button>
+  </form>
+</div>
+
+<% if (!members.length) { %>
+  <p class="text-slate-500 italic">Aucun technicien trouvé.</p>
+<% } else { %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <% members.forEach(m => { %>
+      <!-- CARTE CLIQUABLE -->
+      <div onclick="window.location.href='/directory/<%= m.id %>'" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 cursor-pointer hover:shadow-lg hover:border-primary transition-all group flex flex-col">
+        
+        <div class="flex items-center gap-4 mb-4">
+          <div class="h-16 w-16 rounded-full bg-slate-200 overflow-hidden shrink-0">
+            <% if (m.photo_path) { %>
+              <img src="/uploads/<%= m.photo_path %>" class="w-full h-full object-cover">
+            <% } else { %>
+              <div class="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xl"><%= m.name.charAt(0) %></div>
+            <% } %>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg group-hover:text-primary transition-colors"><%= m.name %></h3>
+            <p class="text-xs text-slate-500"><%= m.spec %></p>
+          </div>
+        </div>
+        
+        <% if (m.skills) { %>
+          <div class="flex flex-wrap gap-1 mb-4">
+            <% m.skills.split(',').slice(0, 3).forEach(s => { %>
+              <span class="text-[10px] px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full"><%= s.trim() %></span>
+            <% }) %>
+            <% if(m.skills.split(',').length > 3) { %><span class="text-[10px] px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">...</span><% } %>
+          </div>
+        <% } %>
+
+        <% if (m.bio) { %>
+          <p class="text-slate-600 text-sm mb-4 line-clamp-2"><%= m.bio %></p>
+        <% } %>
+        
+        <div class="mt-auto">
+          <button class="w-full py-2 text-sm font-semibold text-primary bg-red-50 rounded-lg group-hover:bg-primary group-hover:text-white transition-colors">
+            Voir le profil complet
+          </button>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+<%- include('partials/footer') %>
