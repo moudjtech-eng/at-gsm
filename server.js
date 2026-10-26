@@ -55,8 +55,7 @@ app.use('/admin', require('./routes/admin'));
 app.use('/api', require('./routes/api'));
 
 // --- FACTURATION AUTOMATIQUE (CRON) ---
-// "0 0 1 * *" = À minuit, le 1er jour de chaque mois
-cron.schedule('0 0 1 * *', () => {
+cron.schedule('0 0 1 * *', async () => {
     console.log('⏰ Début de la facturation mensuelle automatique...');
     
     const now = new Date();
@@ -64,28 +63,25 @@ cron.schedule('0 0 1 * *', () => {
     const currentMonth = MONTH_NAMES[now.getMonth()];
     const currentYear = now.getFullYear();
     const MONTHLY_FEE = 500;
-    const today = new Date().toISOString().slice(0, 10);
 
     try {
-        const members = db.prepare("SELECT m.id, m.debt_months FROM members m JOIN users u ON u.id = m.user_id WHERE u.status = 'actif' AND u.role = 'member'").all();
+        const { rows: members } = await db.execute("SELECT m.id, m.debt_months FROM members m JOIN users u ON u.id = m.user_id WHERE u.status = 'actif' AND u.role = 'member'");
 
         for (const m of members) {
-            const alreadyBilled = db.prepare("SELECT id FROM contributions WHERE member_id = ? AND month = ? AND year = ?").get(m.id, currentMonth, currentYear);
+            const { rows: billed } = await db.execute({
+                sql: "SELECT id FROM contributions WHERE member_id = ? AND month = ? AND year = ?",
+                args: [m.id, currentMonth, currentYear]
+            });
             
-            if (!alreadyBilled) {
-                if (m.debt_months < 0) {
-                    // Le membre est en avance. On utilise 1 mois de son crédit.
-                    db.prepare("UPDATE members SET debt_months = debt_months + 1 WHERE id = ?").run(m.id);
-                    // Le mois est déjà payé par son avance
-                    db.prepare("INSERT INTO contributions (member_id, month, year, amount, status, paid_at) VALUES (?, ?, ?, ?, 'paid', ?)")
-                      .run(m.id, currentMonth, currentYear, MONTHLY_FEE, today);
-                    console.log(`✅ ${currentMonth} pré-payé par le membre ID ${m.id}`);
-                } else {
-                    // Le membre n'est pas en avance. On ajoute la dette.
-                    db.prepare("UPDATE members SET debt_months = debt_months + 1 WHERE id = ?").run(m.id);
-                    db.prepare("INSERT INTO contributions (member_id, month, year, amount, status) VALUES (?, ?, ?, ?, 'pending')")
-                      .run(m.id, currentMonth, currentYear, MONTHLY_FEE);
-                }
+            if (billed.length === 0) {
+                await db.execute({
+                    sql: "UPDATE members SET debt_months = debt_months + 1 WHERE id = ?",
+                    args: [m.id]
+                });
+                await db.execute({
+                    sql: "INSERT INTO contributions (member_id, month, year, amount, status) VALUES (?, ?, ?, ?, 'pending')",
+                    args: [m.id, currentMonth, currentYear, MONTHLY_FEE]
+                });
             }
         }
         console.log(`✅ Facturation terminée pour ${currentMonth} ${currentYear}.`);
@@ -94,7 +90,7 @@ cron.schedule('0 0 1 * *', () => {
     }
 });
 
-// --- GESTION DES ERREURS (TOUJOURS À LA FIN) ---
+// --- GESTION DES ERREURS ---
 app.use((req, res) => {
   res.status(404).render('error', { title: 'Page non trouvée', message: 'Cette page n\'existe pas.' });
 });
@@ -106,6 +102,4 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log('\n🚀 AT-GSM démarré : http://localhost:' + PORT);
-  console.log('⚙️  Admin  : admin@atgsm.bj / admin2026');
-  console.log('👤 Membre : jean@atgsm.bj / jean123\n');
 });
