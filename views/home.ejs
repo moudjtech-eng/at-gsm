@@ -1,27 +1,15 @@
 <%- include('partials/header') %>
 
 <div class="relative overflow-hidden rounded-3xl bg-dark text-white shadow-2xl min-h-[400px] md:min-h-[500px] flex items-center mb-12">
-  <!-- C'EST ICI QUE SE TROUVENT LES IMAGES DU CARROUSEL -->
   <div id="hero-carousel" class="absolute inset-0 w-full h-full">
-    
-    <!-- Image 1 -->
     <div class="carousel-item active relative w-full h-full">
       <img src="/images/slide1.jpg" onerror="this.src='https://images.unsplash.com/photo-1512428559087-565658d65721?auto=format&fit=crop&q=80&w=1200'" class="w-full h-full object-cover opacity-40" alt="Slide 1">
       <div class="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent"></div>
     </div>
-
-    <!-- Image 2 -->
     <div class="carousel-item relative w-full h-full">
       <img src="/images/slide2.jpg" onerror="this.src='https://images.unsplash.com/photo-1581092921461-e777640d82fc?auto=format&fit=crop&q=80&w=1200'" class="w-full h-full object-cover opacity-40" alt="Slide 2">
       <div class="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent"></div>
     </div>
-
-    <!-- Image 3 -->
-    <div class="carousel-item relative w-full h-full">
-      <img src="/images/slide3.jpg" onerror="this.src='https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&q=80&w=1200'" class="w-full h-full object-cover opacity-40" alt="Slide 3">
-      <div class="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent"></div>
-    </div>
-
   </div>
   
   <div class="relative z-10 max-w-3xl mx-auto px-8 py-20 text-center">
@@ -34,7 +22,6 @@
   </div>
 </div>
 
-<!-- SECTION HOMMAGE À EDJO -->
 <div class="bg-slate-900 rounded-3xl p-8 md:p-12 mb-12 text-center shadow-xl relative overflow-hidden">
   <div class="absolute inset-0 opacity-5 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white via-slate-400 to-transparent"></div>
   <div class="relative z-10 max-w-2xl mx-auto">
@@ -69,12 +56,44 @@
 <% if (!news.length) { %>
   <p class="text-slate-500 italic">Aucune actualité pour le moment.</p>
 <% } else { %>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
     <% news.forEach(n => { %>
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <span class="text-xs font-bold uppercase px-2 py-1 bg-red-100 text-red-700 rounded"><%= n.category %></span>
-        <h3 class="text-xl font-bold mt-3 mb-2"><%= n.title %></h3>
-        <p class="text-slate-600 text-sm"><%= n.content %></p>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
+        
+        <!-- IMAGE DE COUVERTURE -->
+        <div class="h-48 bg-slate-100 relative overflow-hidden shrink-0">
+          <% if (n.image_path) { %>
+            <img src="/uploads/<%= n.image_path %>" onerror="this.src='https://images.unsplash.com/photo-1581092921461-e777640d82fc?auto=format&fit=crop&q=80&w=400'" class="w-full h-full object-cover">
+          <% } else { %>
+            <img src="https://images.unsplash.com/photo-1512428559087-565658d65721?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover">
+          <% } %>
+          <span class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-slate-800">
+            <%= new Date(n.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+          </span>
+        </div>
+
+        <!-- CONTENU -->
+        <div class="p-6 flex flex-col flex-1">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 bg-red-100 text-red-700 rounded"><%= n.category %></span>
+          </div>
+          <h3 class="text-xl font-bold mb-2 leading-tight"><%= n.title %></h3>
+          <p class="text-slate-600 text-sm mb-4 line-clamp-3"><%= n.content %></p>
+          
+          <!-- AUTEUR ET BOUTON -->
+          <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                <%= n.author ? n.author.charAt(0).toUpperCase() : 'A' %>
+              </div>
+              <div>
+                <p class="text-[10px] text-slate-400 font-bold uppercase">Auteur</p>
+                <p class="text-xs font-bold text-slate-700 truncate max-w-[100px]"><%= n.author || 'Admin' %></p>
+              </div>
+            </div>
+            <button onclick="alert('Le détail de l\'article sera bientôt disponible.')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors">Lire la suite</button>
+          </div>
+        </div>
       </div>
     <% }) %>
   </div>

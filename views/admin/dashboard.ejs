@@ -1,25 +1,30 @@
 <%- include('../partials/header') %>
 <h1 class="text-3xl font-bold mb-8">Panel Admin</h1>
+
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-  <div class="bg-white p-6 rounded-2xl border shadow-sm"><p class="text-slate-500 text-xs uppercase font-bold">Membres</p><p class="text-3xl font-extrabold"><%= stats.totalMembers %></p></div>
-  <div class="bg-white p-6 rounded-2xl border shadow-sm"><p class="text-slate-500 text-xs uppercase font-bold">Paiements</p><p class="text-3xl font-extrabold text-yellow-600"><%= stats.totalPending %></p></div>
-  <div class="bg-white p-6 rounded-2xl border shadow-sm"><p class="text-slate-500 text-xs uppercase font-bold">Candidatures</p><p class="text-3xl font-extrabold text-primary"><%= stats.totalApplications %></p></div>
-  <div class="bg-white p-6 rounded-2xl border shadow-sm"><p class="text-slate-500 text-xs uppercase font-bold">News</p><p class="text-3xl font-extrabold"><%= stats.totalNews %></p></div>
+  <div class="bg-white p-6 rounded-2xl border shadow-sm">
+    <p class="text-slate-500 text-xs uppercase font-bold">Membres</p>
+    <p class="text-3xl font-extrabold"><%= stats.totalMembers %></p>
+  </div>
+  <div class="bg-white p-6 rounded-2xl border shadow-sm">
+    <p class="text-slate-500 text-xs uppercase font-bold text-green-600">Paiements Validés</p>
+    <p class="text-3xl font-extrabold text-green-600"><%= stats.totalValidated %></p>
+  </div>
+  <div class="bg-white p-6 rounded-2xl border shadow-sm">
+    <p class="text-slate-500 text-xs uppercase font-bold text-primary">Candidatures</p>
+    <p class="text-3xl font-extrabold text-primary"><%= stats.totalApplications %></p>
+  </div>
+  <div class="bg-white p-6 rounded-2xl border shadow-sm">
+    <p class="text-slate-500 text-xs uppercase font-bold">News</p>
+    <p class="text-3xl font-extrabold"><%= stats.totalNews %></p>
+  </div>
 </div>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-  <a href="/admin/members" class="bg-dark text-white p-6 rounded-2xl font-bold">Membres →</a>
-  <a href="/admin/payments" class="bg-primary text-white p-6 rounded-2xl font-bold">Paiements →</a>
-  <a href="/admin/applications" class="bg-yellow-600 text-white p-6 rounded-2xl font-bold">Candidatures →</a>
-  <a href="/admin/news" class="bg-green-700 text-white p-6 rounded-2xl font-bold">News →</a>
 
-  <!-- Ajoute ce nouveau bouton à côté des autres -->
-<a href="/admin/finances" class="bg-green-600 text-white p-6 rounded-2xl font-bold flex items-center justify-between shadow-sm hover:bg-green-700 transition-colors md:col-span-2">
-  <span>💰 Voir les Finances & Dettes</span>
-  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-</a>
-
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <a href="/admin/members" class="bg-dark text-white p-6 rounded-2xl font-bold flex justify-between items-center hover:bg-slate-800 transition-colors">👥 Membres <span>→</span></a>
+  <a href="/admin/payments" class="bg-primary text-white p-6 rounded-2xl font-bold flex justify-between items-center hover:bg-red-700 transition-colors">💳 Paiements <span>→</span></a>
+  <a href="/admin/applications" class="bg-yellow-600 text-white p-6 rounded-2xl font-bold flex justify-between items-center hover:bg-yellow-700 transition-colors">📝 Candidatures <span>→</span></a>
+  <a href="/admin/news" class="bg-green-700 text-white p-6 rounded-2xl font-bold flex justify-between items-center hover:bg-green-800 transition-colors">📰 News <span>→</span></a>
+  <a href="/admin/finances" class="bg-green-600 text-white p-6 rounded-2xl font-bold flex justify-between items-center shadow-sm hover:bg-green-700 transition-colors md:col-span-2">💰 Voir les Finances & Dettes <span>→</span></a>
 </div>
-
-
-
 <%- include('../partials/footer') %>
