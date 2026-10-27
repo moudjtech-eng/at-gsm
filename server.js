@@ -13,6 +13,9 @@ const db = require('./db/database');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ⚠️ C'EST CETTE LIGNE QUI RÈGLE LE PROBLÈME DE DÉCONNEXION SUR RENDER
+app.set('trust proxy', 1);
+
 // Uploads dir
 fs.mkdirSync(path.join(__dirname, 'public', 'uploads'), { recursive: true });
 
@@ -28,7 +31,8 @@ app.use(session({
   cookie: {
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24 * 7,
-    secure: process.env.NODE_ENV === 'production'
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax' // Ajout de sécurité supplémentaire
   }
 }));
 
