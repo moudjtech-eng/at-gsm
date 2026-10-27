@@ -1,7 +1,25 @@
 <%- include('partials/header') %>
 
+<!-- ANIMATION CSS POUR LE SCROLL -->
+<style>
+  .reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+  }
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .countdown-box {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+</style>
+
 <!-- HERO SECTION ANIMÉE -->
-<div class="relative overflow-hidden rounded-3xl bg-dark text-white shadow-2xl min-h-[500px] flex items-center mb-16 border border-slate-800">
+<div class="relative overflow-hidden rounded-3xl bg-dark text-white shadow-2xl min-h-[500px] flex items-center mb-12 border border-slate-800">
   <div id="hero-carousel" class="absolute inset-0 w-full h-full">
     <div class="carousel-item active relative w-full h-full">
       <img src="/images/slide1.jpg" onerror="this.src='https://images.unsplash.com/photo-1512428559087-565658d65721?auto=format&fit=crop&q=80&w=1200'" class="w-full h-full object-cover opacity-30" alt="Slide 1">
@@ -28,28 +46,59 @@
   </div>
 </div>
 
+<!-- COMPTE A REBOURS (NOUVEAU) -->
+<div class="reveal bg-dark rounded-3xl p-6 md:p-10 mb-16 shadow-2xl border border-slate-800 relative overflow-hidden">
+  <div class="absolute -top-20 -right-20 w-64 h-64 bg-primary opacity-20 rounded-full blur-3xl"></div>
+  <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+    <div class="text-center md:text-left">
+      <h2 class="text-2xl md:text-3xl font-extrabold text-white mb-2">Prochaine Assemblée Générale</h2>
+      <p class="text-slate-400">Ne manquez pas le grand rassemblement des techniciens de Bohicon.</p>
+    </div>
+    
+    <!-- Les boîtes du compte à rebours -->
+    <div class="flex gap-3 md:gap-4 text-center">
+      <div class="countdown-box rounded-2xl p-3 md:p-4 min-w-[70px] md:min-w-[90px]">
+        <span id="days" class="block text-3xl md:text-5xl font-black text-white">00</span>
+        <span class="text-[10px] md:text-xs text-primary font-bold uppercase tracking-wider">Jours</span>
+      </div>
+      <div class="countdown-box rounded-2xl p-3 md:p-4 min-w-[70px] md:min-w-[90px]">
+        <span id="hours" class="block text-3xl md:text-5xl font-black text-white">00</span>
+        <span class="text-[10px] md:text-xs text-primary font-bold uppercase tracking-wider">Heures</span>
+      </div>
+      <div class="countdown-box rounded-2xl p-3 md:p-4 min-w-[70px] md:min-w-[90px]">
+        <span id="minutes" class="block text-3xl md:text-5xl font-black text-white">00</span>
+        <span class="text-[10px] md:text-xs text-primary font-bold uppercase tracking-wider">Min</span>
+      </div>
+      <div class="countdown-box rounded-2xl p-3 md:p-4 min-w-[70px] md:min-w-[90px]">
+        <span id="seconds" class="block text-3xl md:text-5xl font-black text-primary">00</span>
+        <span class="text-[10px] md:text-xs text-primary font-bold uppercase tracking-wider">Sec</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- SECTION STATISTIQUES -->
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+<div class="reveal grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
   <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transform hover:-translate-y-1 transition-transform">
     <p class="text-4xl font-extrabold text-primary mb-1">50+</p>
     <p class="text-sm font-bold text-slate-500 uppercase">Techniciens</p>
   </div>
-  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transform hover:-translate-y-1 transition-transform" style="transition-delay: 100ms;">
     <p class="text-4xl font-extrabold text-primary mb-1">1000+</p>
     <p class="text-sm font-bold text-slate-500 uppercase">Réparations</p>
   </div>
-  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transform hover:-translate-y-1 transition-transform" style="transition-delay: 200ms;">
     <p class="text-4xl font-extrabold text-primary mb-1">100%</p>
     <p class="text-sm font-bold text-slate-500 uppercase">Satisfaction</p>
   </div>
-  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transform hover:-translate-y-1 transition-transform" style="transition-delay: 300ms;">
     <p class="text-4xl font-extrabold text-primary mb-1">24/7</p>
     <p class="text-sm font-bold text-slate-500 uppercase">Support</p>
   </div>
 </div>
 
 <!-- SECTION NOS EXPERTISES -->
-<div class="mb-16">
+<div class="reveal mb-16">
   <div class="text-center mb-10">
     <h2 class="text-3xl md:text-4xl font-bold text-dark mb-4">Pourquoi nous choisir ?</h2>
     <p class="text-slate-600 max-w-2xl mx-auto">Nos membres sont formés aux techniques les plus pointues pour redonner vie à vos appareils.</p>
@@ -81,7 +130,7 @@
 </div>
 
 <!-- SECTION HOMMAGE À EDJO -->
-<div class="bg-slate-900 rounded-3xl p-8 md:p-12 mb-16 text-center shadow-xl relative overflow-hidden border border-slate-800">
+<div class="reveal bg-slate-900 rounded-3xl p-8 md:p-12 mb-16 text-center shadow-xl relative overflow-hidden border border-slate-800">
   <div class="absolute inset-0 opacity-5 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white via-slate-400 to-transparent"></div>
   <div class="relative z-10 max-w-2xl mx-auto">
     <div class="mx-auto w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mb-6 text-primary">
@@ -97,7 +146,7 @@
 </div>
 
 <!-- SECTION ACTUALITÉS -->
-<div class="mb-12">
+<div class="reveal mb-12">
   <div class="flex items-center justify-between mb-8">
     <h2 class="text-3xl font-bold text-dark">Nos Projets & Actualités</h2>
     <a href="/about" class="text-primary font-bold hover:underline hidden md:block">En savoir plus sur nous</a>
@@ -144,5 +193,67 @@
     </div>
   <% } %>
 </div>
+
+<!-- SCRIPTS POUR LE CARROUSEL, LE COMPTE A REBOURS ET LE SCROLL -->
+<style>
+  .carousel-item { display: none; }
+  .carousel-item.active { display: block; animation: fadeIn 1s; }
+  @keyframes fadeIn { from { opacity: 0.5; } to { opacity: 1; } }
+</style>
+<script>
+  // 1. GESTION DU CARROUSEL
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.carousel-item');
+  if (slides.length > 0) {
+    setInterval(() => {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }, 5000);
+  }
+
+  // 2. COMPTE A REBOURS (Cible : 31 Décembre 2026 à 23:59:59)
+  // Tu peux changer cette date pour la prochaine AG
+  const targetDate = new Date("December 31, 2026 23:59:59").getTime();
+
+  const countdownInterval = setInterval(function() {
+    const now = new Date().getTime();
+    const distance = targetDate - now;
+
+    if (distance < 0) {
+      clearInterval(countdownInterval);
+      document.getElementById("days").innerText = "00";
+      document.getElementById("hours").innerText = "00";
+      document.getElementById("minutes").innerText = "00";
+      document.getElementById("seconds").innerText = "00";
+      return;
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    document.getElementById("days").innerText = days < 10 ? "0" + days : days;
+    document.getElementById("hours").innerText = hours < 10 ? "0" + hours : hours;
+    document.getElementById("minutes").innerText = minutes < 10 ? "0" + minutes : minutes;
+    document.getElementById("seconds").innerText = seconds < 10 ? "0" + seconds : seconds;
+  }, 1000);
+
+  // 3. ANIMATION AU SCROLL (Bas vers le haut)
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+      }
+    });
+  }, {
+    threshold: 0.1 // Déclenche l'animation quand 10% de la section est visible
+  });
+
+  document.querySelectorAll('.reveal').forEach((el) => {
+    observer.observe(el);
+  });
+</script>
 
 <%- include('partials/footer') %>
