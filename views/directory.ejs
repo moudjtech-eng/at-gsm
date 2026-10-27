@@ -1,15 +1,20 @@
 <%- include('partials/header') %>
+
+<!-- EN-TÊTE ET BARRE DE RECHERCHE -->
 <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
   <div>
-    <h1 class="text-3xl font-bold">Techniciens Certifiés</h1>
-    <p class="text-slate-600">Trouvez un professionnel vérifié à Bohicon.</p>
+    <h1 class="text-2xl md:text-3xl font-bold">Techniciens Certifiés</h1>
+    <p class="text-slate-600 text-sm md:text-base mt-1">Trouvez un professionnel vérifié à Bohicon.</p>
   </div>
-  <form action="/directory" method="GET" class="flex">
-    <input type="text" name="q" value="<%= q %>" placeholder="Rechercher..." class="px-4 py-2 border border-slate-300 rounded-l-lg focus:outline-none">
-    <button class="bg-primary text-white px-4 py-2 rounded-r-lg font-bold hover:bg-red-700">Chercher</button>
+  
+  <!-- C'EST ICI QUE LE BUG ÉTAIT, MAINTENANT CORRIGÉ -->
+  <form action="/directory" method="GET" class="flex w-full md:w-auto">
+    <input type="text" name="q" value="<%= q %>" placeholder="Rechercher..." class="w-full md:w-64 px-4 py-2 border border-slate-300 rounded-l-lg focus:outline-none border-r-0">
+    <button class="bg-primary text-white px-4 py-2 rounded-r-lg font-bold hover:bg-red-700 shrink-0">Chercher</button>
   </form>
 </div>
 
+<!-- GRILLE DES TECHNICIENS -->
 <% if (!members.length) { %>
   <p class="text-slate-500 italic">Aucun technicien trouvé.</p>
 <% } else { %>
