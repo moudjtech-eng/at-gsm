@@ -1,29 +1,90 @@
 <%- include('../partials/header') %>
 <h1 class="text-3xl font-bold mb-6">Modifier Mon Profil</h1>
 <div class="max-w-2xl space-y-6">
+  
+  <!-- FORMULAIRE PRINCIPAL -->
   <div class="bg-white p-8 rounded-2xl border shadow-sm">
     <form action="/member/profile" method="POST" enctype="multipart/form-data" class="space-y-4">
-      <div><label class="text-sm font-bold">Photo</label><input type="file" name="photo" accept="image/*" class="w-full px-4 py-2 border rounded-lg mt-1"></div>
-      <div class="grid grid-cols-2 gap-4">
-        <div><label class="text-sm font-bold">Nom</label><input name="name" value="<%= member.name %>" required class="w-full px-4 py-2 border rounded-lg mt-1"></div>
-        <div><label class="text-sm font-bold">Spécialisation</label><input name="spec" value="<%= member.spec || '' %>" class="w-full px-4 py-2 border rounded-lg mt-1"></div>
+      
+      <div>
+        <label class="text-sm font-bold text-slate-700">Photo de Profil</label>
+        <input type="file" name="photo" accept="image/*" class="w-full px-4 py-2 border rounded-lg mt-1">
       </div>
-      <div><label class="text-sm font-bold">Compétences</label><input name="skills" value="<%= member.skills || '' %>" class="w-full px-4 py-2 border rounded-lg mt-1"></div>
-      <div><label class="text-sm font-bold">URL Site</label><input name="url" type="url" value="<%= member.url || '' %>" class="w-full px-4 py-2 border rounded-lg mt-1"></div>
-      <div><label class="text-sm font-bold">Bio</label><textarea name="bio" rows="4" class="w-full px-4 py-2 border rounded-lg mt-1"><%= member.bio || '' %></textarea></div>
-      <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-red-700">Sauvegarder</button>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm font-bold text-slate-700">Nom Complet</label>
+          <input name="name" value="<%= member.name %>" required class="w-full px-4 py-2 border rounded-lg mt-1">
+        </div>
+        <div>
+          <label class="text-sm font-bold text-slate-700">Spécialisation</label>
+          <input name="spec" value="<%= member.spec || '' %>" class="w-full px-4 py-2 border rounded-lg mt-1">
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm font-bold text-slate-700">Compétences (séparées par des virgules)</label>
+        <input name="skills" value="<%= member.skills || '' %>" placeholder="Ex: iPhone, Samsung, Micro-soudure" class="w-full px-4 py-2 border rounded-lg mt-1">
+      </div>
+
+      <div>
+        <label class="text-sm font-bold text-slate-700">URL Site Personnel</label>
+        <input name="url" type="url" value="<%= member.url || '' %>" placeholder="https://monsite.bj" class="w-full px-4 py-2 border rounded-lg mt-1">
+      </div>
+
+      <div>
+        <label class="text-sm font-bold text-slate-700">Lieu / Adresse de votre centre</label>
+        <input name="location" value="<%= member.location || '' %>" placeholder="Ex: Quartier Dassasgho, Bohicon" class="w-full px-4 py-2 border rounded-lg mt-1">
+      </div>
+
+      <!-- COORDONNÉES GPS POUR LA CARTE -->
+      <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mt-4 mb-4">
+        <p class="text-sm font-bold text-slate-700 mb-2">📍 Coordonnées GPS (pour la carte interactive)</p>
+        <p class="text-xs text-slate-500 mb-3">
+          Allez sur <a href="https://maps.google.com" target="_blank" class="text-primary underline">Google Maps</a>, faites un clic droit sur votre boutique, et cliquez sur les chiffres (ex: 7.182466, 2.067879) pour les copier. Collez-les ci-dessous.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-bold text-slate-600">Latitude</label>
+            <input name="latitude" type="number" step="any" value="<%= member.latitude || '' %>" placeholder="Ex: 7.182466" class="w-full px-4 py-2 border rounded-lg mt-1">
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-600">Longitude</label>
+            <input name="longitude" type="number" step="any" value="<%= member.longitude || '' %>" placeholder="Ex: 2.067879" class="w-full px-4 py-2 border rounded-lg mt-1">
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm font-bold text-slate-700">Bio / À propos</label>
+        <textarea name="bio" rows="4" class="w-full px-4 py-2 border rounded-lg mt-1"><%= member.bio || '' %></textarea>
+      </div>
+
+      <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-red-700 w-full md:w-auto">Sauvegarder les modifications</button>
     </form>
   </div>
+
+  <!-- CHANGEMENT DE MOT DE PASSE -->
   <div class="bg-white p-8 rounded-2xl border shadow-sm">
     <h3 class="text-lg font-bold mb-4">🔐 Changer le mot de passe</h3>
     <form action="/member/password" method="POST" class="space-y-4">
-      <div><label class="text-sm font-bold">Actuel</label><input type="password" name="current" required class="w-full px-4 py-2 border rounded-lg mt-1"></div>
-      <div class="grid grid-cols-2 gap-4">
-        <div><label class="text-sm font-bold">Nouveau</label><input type="password" name="newPwd" minlength="6" required class="w-full px-4 py-2 border rounded-lg mt-1"></div>
-        <div><label class="text-sm font-bold">Confirmer</label><input type="password" name="confirm" minlength="6" required class="w-full px-4 py-2 border rounded-lg mt-1"></div>
+      <div>
+        <label class="text-sm font-bold text-slate-700">Mot de passe actuel</label>
+        <input type="password" name="current" required class="w-full px-4 py-2 border rounded-lg mt-1">
       </div>
-      <button type="submit" class="bg-dark text-white px-6 py-2 rounded-lg font-bold">Changer</button>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm font-bold text-slate-700">Nouveau mot de passe</label>
+          <input type="password" name="newPwd" minlength="6" required class="w-full px-4 py-2 border rounded-lg mt-1">
+        </div>
+        <div>
+          <label class="text-sm font-bold text-slate-700">Confirmer</label>
+          <input type="password" name="confirm" minlength="6" required class="w-full px-4 py-2 border rounded-lg mt-1">
+        </div>
+      </div>
+      <button type="submit" class="bg-dark text-white px-6 py-2 rounded-lg font-bold hover:bg-slate-800 w-full md:w-auto">Changer le mot de passe</button>
     </form>
   </div>
+
 </div>
 <%- include('../partials/footer') %>

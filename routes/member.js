@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const db = require('../db/database');
 const { requireMember } = require('../middleware/auth');
-const { kkiapay } = require('@kkiapay-org/nodejs-sdk'); // On importe le SDK officiel
+const { kkiapay } = require('@kkiapay-org/nodejs-sdk');
 
 const upload = multer({
   dest: 'public/uploads/',
@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// --- MODIFICATION DU PROFIL ---
+// --- MODIFICATION DU PROFIL (AVEC LIEU ET GPS) ---
 router.get('/profile', async (req, res) => {
   const { rows } = await db.execute({ sql: "SELECT * FROM members WHERE user_id = ?", args: [req.session.user.id] });
   res.render('member/profile', { title: 'Mon Profil', member: rows[0] });
@@ -54,12 +54,13 @@ router.post('/profile', upload.single('photo'), async (req, res) => {
   const { rows } = await db.execute({ sql: "SELECT * FROM members WHERE user_id = ?", args: [req.session.user.id] });
   const member = rows[0];
   
-  const { name, spec, skills, url, bio } = req.body;
+  // On récupère tous les champs, y compris location, latitude et longitude
+  const { name, spec, skills, url, bio, location, latitude, longitude } = req.body;
   const photoPath = req.file ? req.file.filename : member.photo_path;
 
   await db.execute({
-    sql: `UPDATE members SET name = ?, spec = ?, skills = ?, url = ?, bio = ?, photo_path = ? WHERE user_id = ?`,
-    args: [name, spec, skills, url, bio, photoPath, req.session.user.id]
+    sql: `UPDATE members SET name = ?, spec = ?, skills = ?, url = ?, bio = ?, location = ?, latitude = ?, longitude = ?, photo_path = ? WHERE user_id = ?`,
+    args: [name, spec, skills, url, bio, location, latitude || null, longitude || null, photoPath, req.session.user.id]
   });
 
   req.flash('success', 'Profil mis à jour avec succès.');
@@ -121,7 +122,6 @@ router.post('/pay-kkiapay', async (req, res) => {
   try {
     console.log(`🔍 Vérification de la transaction Kkiapay via SDK : ${transactionId}`);
 
-    // Initialisation du SDK avec tes clés
     const k = kkiapay({
       privatekey: process.env.KKIA_PRIVATE_KEY,
       publickey: process.env.KKIA_PUBLIC_KEY,
@@ -132,7 +132,6 @@ router.post('/pay-kkiapay', async (req, res) => {
     let kkiaData = null;
     let isSuccess = false;
 
-    // Le SDK gère les tentatives. On en fait 5 pour être sûr que KkiaPay a eu le temps de traiter.
     for (let attempt = 1; attempt <= 5; attempt++) {
       kkiaData = await k.verify(transactionId);
       console.log(`📡 Tentative ${attempt} - Réponse KkiaPay :`, kkiaData);
@@ -143,7 +142,7 @@ router.post('/pay-kkiapay', async (req, res) => {
       }
       
       if (attempt < 5) {
-        await new Promise(resolve => setTimeout(resolve, 1500)); // On attend 1.5s
+        await new Promise(resolve => setTimeout(resolve, 1500));
       }
     }
 
@@ -151,13 +150,11 @@ router.post('/pay-kkiapay', async (req, res) => {
       return res.json({ success: false, message: "KkiaPay n'a pas confirmé le paiement (Statut: " + (kkiaData ? kkiaData.status : 'Inconnu') + ")." });
     }
 
-    // Vérification du montant
     const montantAttendu = parseInt(months) * MONTHLY_FEE;
     if (Number(kkiaData.amount) < montantAttendu) {
       return res.json({ success: false, message: "Le montant payé est inférieur au montant attendu." });
     }
 
-    // --- MISE À JOUR DE LA BASE DE DONNÉES ---
     const ref = transactionId;
     const monthsPaid = parseInt(months);
     
@@ -209,7 +206,6 @@ router.post('/pay-kkiapay', async (req, res) => {
       }
     }
 
-    // --- ENVOI DES EMAILS ---
     sendReceiptEmail(
       { email: req.session.user.email, name: member.name, spec: member.spec, phone: member.phone }, 
       { ref: ref, months: monthsPaid, amount: montantAttendu }
@@ -220,12 +216,10 @@ router.post('/pay-kkiapay', async (req, res) => {
       sendAdminNotificationEmail(adminRows[0].email, member.name, montantAttendu, monthsPaid, ref);
     }
 
-    console.log("✅ Paiement enregistré et emails envoyés.");
     return res.json({ success: true });
 
   } catch (error) {
     console.error("❌ Erreur Kkiapay backend:", error);
-    // On renvoie le message d'erreur exact pour le débogage
     return res.json({ success: false, message: "Erreur de vérification KkiaPay : " + (error.message || "Erreur inconnue") });
   }
 });

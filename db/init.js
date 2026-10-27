@@ -30,7 +30,7 @@ async function init() {
     )
   `);
   await db.execute(`
-    CREATE TABLE IF NOT EXISTS members (
+        CREATE TABLE IF NOT EXISTS members (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL UNIQUE,
       name TEXT NOT NULL,
@@ -39,9 +39,13 @@ async function init() {
       skills TEXT,
       url TEXT,
       bio TEXT,
+      location TEXT,
+      latitude REAL,    /* <-- AJOUTE CECI */
+      longitude REAL,   /* <-- AJOUTE CECI */
       photo_path TEXT,
       debt_months INTEGER NOT NULL DEFAULT 0,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
     )
   `);
   await db.execute(`
