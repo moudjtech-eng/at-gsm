@@ -1,11 +1,14 @@
 <%- include('../partials/header') %>
-<h1 class="text-3xl font-bold mb-6">Validation des Paiements</h1>
+<h1 class="text-2xl md:text-3xl font-bold mb-6">Validation des Paiements</h1>
 <div class="bg-white rounded-2xl border shadow-sm overflow-x-auto">
-  <table class="w-full text-sm min-w-[700px]">
+  <table class="w-full text-sm min-w-[600px]">
     <thead class="bg-slate-50"><tr>
-      <th class="px-4 py-3 text-left">Membre</th><th class="px-4 py-3 text-left">Mois</th>
-      <th class="px-4 py-3 text-left">Montant</th><th class="px-4 py-3 text-left">Réf</th>
-      <th class="px-4 py-3 text-left">Statut</th><th class="px-4 py-3 text-right">Actions</th>
+      <th class="px-4 py-3 text-left">Membre</th>
+      <th class="px-4 py-3 text-left">Mois</th>
+      <th class="px-4 py-3 text-left">Montant</th>
+      <th class="px-4 py-3 text-left hidden md:table-cell">Réf</th>
+      <th class="px-4 py-3 text-left">Statut</th>
+      <th class="px-4 py-3 text-right">Actions</th>
     </tr></thead>
     <tbody class="divide-y">
       <% if (!payments.length) { %><tr><td colspan="6" class="px-4 py-8 text-center text-slate-400 italic">Aucun paiement</td></tr><% } %>
@@ -13,16 +16,16 @@
         <tr>
           <td class="px-4 py-3 font-medium"><%= p.member_name %></td>
           <td class="px-4 py-3"><%= p.months %></td>
-          <td class="px-4 py-3 font-bold"><%= p.amount.toLocaleString('fr-FR') %> FCFA</td>
-          <td class="px-4 py-3 font-mono text-xs">#<%= p.ref %></td>
+          <td class="px-4 py-3 font-bold"><%= p.amount.toLocaleString('fr-FR') %> F</td>
+          <td class="px-4 py-3 font-mono text-xs hidden md:table-cell">#<%= p.ref.slice(0,8) %>...</td>
           <td class="px-4 py-3 text-xs font-bold <%= p.status === 'pending' ? 'text-yellow-600' : p.status === 'validated' ? 'text-green-600' : 'text-red-600' %>">
             <%= p.status === 'pending' ? '⏳ En attente' : p.status === 'validated' ? '✅ Validé' : '❌ Rejeté' %>
           </td>
-          <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
-            <a href="/admin/receipt/<%= p.ref %>" target="_blank" class="bg-slate-100 text-slate-700 px-3 py-1 rounded font-bold text-xs hover:bg-slate-200">Voir Reçu</a>
+          <td class="px-4 py-3 text-right space-y-1 md:space-y-0 md:space-x-2 whitespace-nowrap">
+            <a href="/admin/receipt/<%= p.ref %>" target="_blank" class="block md:inline bg-slate-100 text-slate-700 px-2 py-1 rounded font-bold text-[10px] md:text-xs hover:bg-slate-200">Reçu</a>
             <% if (p.status === 'pending') { %>
-              <form action="/admin/payments/<%= p.id %>/validate" method="POST" class="inline"><button class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold">Valider</button></form>
-              <form action="/admin/payments/<%= p.id %>/reject" method="POST" class="inline"><button class="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold">Rejeter</button></form>
+              <form action="/admin/payments/<%= p.id %>/validate" method="POST" class="block md:inline"><button class="bg-green-600 text-white px-2 py-1 rounded font-bold text-[10px] md:text-xs">Valider</button></form>
+              <form action="/admin/payments/<%= p.id %>/reject" method="POST" class="block md:inline"><button class="bg-red-600 text-white px-2 py-1 rounded font-bold text-[10px] md:text-xs">Rejeter</button></form>
             <% } %>
           </td>
         </tr>
