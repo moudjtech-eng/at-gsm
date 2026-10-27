@@ -1,0 +1,70 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-4xl mx-auto space-y-8 pb-10">
+  <div class="flex justify-between items-center">
+    <h1 class="text-3xl font-bold">Mes Actualités</h1>
+    <a href="/member" class="text-sm font-semibold text-slate-500 hover:text-dark">← Retour au tableau de bord</a>
+  </div>
+
+  <!-- FORMULAIRE DE PUBLICATION -->
+  <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
+    <h2 class="text-xl font-bold mb-4">➕ Publier une nouvelle annonce</h2>
+    <form action="/member/news" method="POST" enctype="multipart/form-data" class="space-y-4">
+      <div>
+        <label class="text-sm font-bold text-slate-700">Titre de l'annonce</label>
+        <input name="title" required placeholder="ex. Nouvel atelier de réparation" class="w-full px-4 py-2 border rounded-lg mt-1">
+      </div>
+      <div>
+        <label class="text-sm font-bold text-slate-700">Catégorie</label>
+        <select name="category" required class="w-full px-4 py-2 border rounded-lg mt-1 bg-slate-50">
+          <option value="Formation">Formation</option>
+          <option value="Investissement">Investissement</option>
+          <option value="Communauté">Communauté</option>
+          <option value="Nouvelles Officielles">Nouvelles Officielles</option>
+          <option value="Annonce Technicien">Annonce Technicien</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-sm font-bold text-slate-700">Contenu de l'article</label>
+        <textarea name="content" rows="5" required placeholder="Écrivez votre article ici..." class="w-full px-4 py-2 border rounded-lg mt-1"></textarea>
+      </div>
+      <div>
+        <label class="text-sm font-bold text-slate-700">Image de couverture (Optionnel)</label>
+        <input type="file" name="image" accept="image/*" class="w-full px-4 py-2 border rounded-lg mt-1">
+      </div>
+      <button type="submit" class="bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700 w-full md:w-auto">Publier mon annonce</button>
+    </form>
+  </div>
+
+  <!-- LISTE DES ACTUS DU MEMBRE -->
+  <div>
+    <h2 class="text-xl font-bold mb-4">Mes publications récentes</h2>
+    <% if (!myNews.length) { %>
+      <p class="text-slate-500 italic">Vous n'avez pas encore publié d'actualité.</p>
+    <% } else { %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <% myNews.forEach(n => { %>
+          <div class="bg-white rounded-xl border border-slate-200 p-4 flex gap-4 items-center">
+            <div class="w-16 h-16 rounded-lg bg-slate-100 shrink-0 overflow-hidden">
+              <% if (n.image_path) { %>
+                <img src="/uploads/<%= n.image_path %>" class="w-full h-full object-cover">
+              <% } else { %>
+                <div class="w-full h-full flex items-center justify-center text-slate-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                </div>
+              <% } %>
+            </div>
+            <div class="flex-1 min-w-0">
+              <span class="text-[10px] font-bold uppercase text-primary"><%= n.category %></span>
+              <h3 class="font-bold text-slate-800 truncate"><%= n.title %></h3>
+              <p class="text-xs text-slate-500"><%= new Date(n.created_at).toLocaleDateString('fr-FR') %></p>
+            </div>
+            <a href="/news/<%= n.id %>" target="_blank" class="bg-slate-100 text-slate-600 px-3 py-1 rounded text-xs font-bold hover:bg-slate-200">Voir</a>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

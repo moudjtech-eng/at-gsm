@@ -229,4 +229,49 @@ router.post('/pay-kkiapay', async (req, res) => {
   }
 });
 
+// --- PAGE POUR PUBLIER ET VOIR SES ACTUS ---
+router.get('/news', async (req, res) => {
+  try {
+    const { rows: mRows } = await db.execute({ sql: "SELECT * FROM members WHERE user_id = ?", args: [req.session.user.id] });
+    const member = mRows[0];
+    
+    // On récupère les actus publiées par ce membre
+    const { rows: myNews } = await db.execute({
+      sql: "SELECT * FROM news WHERE author = ? ORDER BY created_at DESC",
+      args: [member.name]
+    });
+
+    res.render('member/news', { title: 'Mes Actualités', member, myNews });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/member');
+  }
+});
+
+// --- POSTER UNE ACTU ---
+router.post('/news', upload.single('image'), async (req, res) => {
+  try {
+    const { title, category, content } = req.body;
+    const { rows: mRows } = await db.execute({ sql: "SELECT name FROM members WHERE user_id = ?", args: [req.session.user.id] });
+    const memberName = mRows[0].name;
+
+    if (!title || !category || !content) {
+      req.flash('error', 'Tous les champs sont requis.');
+      return res.redirect('/member/news');
+    }
+
+    await db.execute({
+      sql: "INSERT INTO news (title, category, content, image_path, author) VALUES (?, ?, ?, ?, ?)",
+      args: [title, category, content, req.file ? req.file.filename : null, memberName]
+    });
+
+    req.flash('success', 'Actualité publiée avec succès !');
+    res.redirect('/member/news');
+  } catch (err) {
+    console.error(err);
+    req.flash('error', 'Erreur serveur.');
+    res.redirect('/member/news');
+  }
+});
+
 module.exports = router;

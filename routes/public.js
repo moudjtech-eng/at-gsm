@@ -91,4 +91,23 @@ router.post('/apply', upload.single('docs'), async (req, res) => {
   }
 });
 
+// --- PAGE DÉTAIL D'UNE ACTUALITÉ ---
+router.get('/news/:id', async (req, res) => {
+  try {
+    const { rows } = await db.execute({ 
+      sql: "SELECT * FROM news WHERE id = ?", 
+      args: [req.params.id] 
+    });
+    const article = rows[0];
+    
+    if (!article) {
+      return res.status(404).render('error', { title: 'Article introuvable', message: 'Cet article n\'existe pas.' });
+    }
+    res.render('news-detail', { title: article.title, article });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/');
+  }
+});
+
 module.exports = router;

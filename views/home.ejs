@@ -91,7 +91,7 @@
                 <p class="text-xs font-bold text-slate-700 truncate max-w-[100px]"><%= n.author || 'Admin' %></p>
               </div>
             </div>
-            <button onclick="alert('Le détail de l\'article sera bientôt disponible.')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors">Lire la suite</button>
+            <a href="/news/<%= n.id %>" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors">Lire la suite</a>
           </div>
         </div>
       </div>

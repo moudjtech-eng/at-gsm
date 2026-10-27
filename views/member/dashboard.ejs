@@ -1,8 +1,14 @@
 <%- include('../partials/header') %>
 
-<div class="flex justify-between items-center mb-8">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
   <h1 class="text-3xl font-bold">Tableau de Bord</h1>
-  <a href="/member/profile" class="bg-dark text-white px-4 py-2 rounded-lg font-bold hover:bg-slate-800">Modifier Profil</a>
+  <div class="flex flex-wrap gap-2">
+    <a href="/member/news" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H15a3 3 0 11-3 3h-3l-8.586-8.586z" /></svg>
+      Publier une actu
+    </a>
+    <a href="/member/profile" class="bg-dark text-white px-4 py-2 rounded-lg font-bold hover:bg-slate-800">Modifier Profil</a>
+  </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -19,7 +25,6 @@
       <h3 class="text-xl font-bold"><%= member.name %></h3>
       <p class="text-slate-500 text-sm mb-4"><%= member.spec %></p>
       
-      <!-- LOGIQUE D'AFFICHAGE DETTE / AVANCE -->
       <div class="p-3 bg-slate-50 rounded-lg text-left">
         <% if (member.debt_months > 0) { %>
           <p class="text-[10px] uppercase text-slate-400 font-bold">Solde dû</p>
@@ -38,23 +43,17 @@
     </div>
   </div>
   
-  <!-- DÉTAILS ET PAIEMENT -->
+  <!-- PAIEMENT ET HISTORIQUE -->
   <div class="lg:col-span-2 space-y-6">
-    
-    <!-- ZONE DE PAIEMENT KKIAPAY -->
     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
       <h2 class="text-xl font-bold mb-4">Payer mes cotisations</h2>
-      
-      <!-- ON AFFICHE TOUJOURS LE PAIEMENT MAINTENANT -->
       <div class="flex flex-col md:flex-row gap-3 items-center">
         <select id="months-select" class="px-4 py-3 border border-slate-300 rounded-lg flex-1 w-full bg-slate-50 font-medium">
-          <!-- On propose jusqu'à 12 mois, ou plus si la dette est élevée -->
-          <% let maxMonths = Math.max(12, member.debt_months + 12); %>
+          <% let maxMonths = Math.max(12, Number(member.debt_months) + 12); %>
           <% for (let i = 1; i <= maxMonths; i++) { %>
             <option value="<%= i %>"><%= i %> mois — <%= (i * MONTHLY_FEE).toLocaleString('fr-FR') %> FCFA</option>
           <% } %>
         </select>
-        
         <button id="btn-payer" class="bg-[#00b0ff] hover:bg-[#0091ea] text-white px-6 py-3 rounded-lg font-bold w-full md:w-auto shadow-md flex items-center justify-center gap-2 transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
           Payer via Mobile Money
@@ -63,7 +62,6 @@
       <p class="text-xs text-slate-500 mt-3">💡 Vous pouvez payer par anticipation pour les mois à venir.</p>
     </div>
 
-    <!-- HISTORIQUE DES COTISATIONS -->
     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
       <h2 class="text-xl font-bold mb-4">Historique</h2>
       <% if (!contributions.length) { %>
@@ -89,7 +87,7 @@
                       <%= c.status === 'paid' ? 'Payé' : 'En attente' %>
                     </span>
                   </td>
-                  <td class="py-3 font-semibold"><%= c.amount.toLocaleString('fr-FR') %> FCFA</td>
+                  <td class="py-3 font-semibold"><%= Number(c.amount).toLocaleString('fr-FR') %> FCFA</td>
                 </tr>
               <% }) %>
             </tbody>
@@ -97,55 +95,15 @@
         </div>
       <% } %>
     </div>
-
-    <!-- REÇUS DE PAIEMENT -->
-    <% if (payments.length) { %>
-      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <h2 class="text-xl font-bold mb-4">Mes reçus & demandes</h2>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="text-slate-400 border-b border-slate-200">
-                <th class="pb-2 text-left">Réf</th>
-                <th class="pb-2 text-left">Montant</th>
-                <th class="pb-2 text-left">Statut</th>
-                <th class="pb-2 text-right">Facture</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% payments.forEach(p => { %>
-                <tr class="border-b border-slate-50">
-                  <td class="py-3 font-mono text-xs text-slate-600">#<%= p.ref %></td>
-                  <td class="py-3 font-semibold"><%= p.amount.toLocaleString('fr-FR') %> FCFA</td>
-                  <td class="py-3 text-xs font-bold">
-                    <%= p.status === 'pending' ? '⏳ En attente' : p.status === 'validated' ? '✅ Validé' : '❌ Rejeté' %>
-                  </td>
-                  <td class="py-3 text-right">
-                    <a href="/member/receipt/<%= p.ref %>" target="_blank" class="bg-slate-100 text-slate-700 px-3 py-1 rounded font-bold text-xs hover:bg-slate-200 transition-colors">Télécharger</a>
-                  </td>
-                </tr>
-              <% }) %>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    <% } %>
   </div>
 </div>
 
-<!-- Données passées au JavaScript sans casser l'éditeur -->
-<div id="payment-data" 
-     data-fee="<%= MONTHLY_FEE %>" 
-     data-key="<%= process.env.KKIA_PUBLIC_KEY || '' %>" 
-     class="hidden">
-</div>
-
 <!-- SCRIPT KKIAPAY -->
+<div id="payment-data" data-fee="<%= MONTHLY_FEE %>" data-key="<%= process.env.KKIA_PUBLIC_KEY || '' %>" class="hidden"></div>
 <script>
   const paymentData = document.getElementById("payment-data");
   const KKIAPAY_PUBLIC_KEY = paymentData.dataset.key;
   const MONTHLY_FEE = parseInt(paymentData.dataset.fee);
-  
   let moisSelectionnes = 1;
   const btnPayer = document.getElementById("btn-payer");
   
@@ -153,46 +111,34 @@
     btnPayer.addEventListener("click", (e) => {
       e.preventDefault();
       moisSelectionnes = parseInt(document.getElementById("months-select").value);
-      const montantTotal = moisSelectionnes * MONTHLY_FEE;
-
       openKkiapayWidget({
-        amount: montantTotal,
+        amount: moisSelectionnes * MONTHLY_FEE,
         key: KKIAPAY_PUBLIC_KEY,
         position: "center",
         theme: "#dc2626",
-        sandbox: true // ⚠️ Passe à "false" pour la production (vrai argent)
+        sandbox: true
       });
     });
   }
 
-    addKkiapayListener("success", async (response) => {
-    console.log("Paiement réussi côté widget, attente de validation...");
-    
-    // On attend 3 secondes que KkiaPay confirme côté serveur
-    setTimeout(async () => {
-      try {
-        const res = await fetch('/member/pay-kkiapay', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ transactionId: response.transactionId, months: moisSelectionnes })
-        });
-        const data = await res.json();
-        
-        if(data.success) {
-          alert("Paiement vérifié et validé avec succès !");
-          window.location.reload();
-        } else {
-          alert("Erreur : " + data.message);
-        }
-      } catch (err) {
-        alert("Erreur réseau. Veuillez contacter l'administrateur.");
+  addKkiapayListener("success", async (response) => {
+    try {
+      const res = await fetch('/member/pay-kkiapay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transactionId: response.transactionId, months: moisSelectionnes })
+      });
+      const data = await res.json();
+      if(data.success) {
+        alert("Paiement validé !");
+        window.location.reload();
+      } else {
+        alert("Erreur : " + data.message);
       }
-    }, 3000); // 3000 millisecondes = 3 secondes
+    } catch (err) { alert("Erreur réseau."); }
   });
 
-  addKkiapayListener("failed", (error) => {
-    alert("Le paiement a échoué ou a été annulé.");
-  });
+  addKkiapayListener("failed", () => alert("Le paiement a échoué."));
 </script>
 
 <%- include('../partials/footer') %>
