@@ -44,27 +44,32 @@ router.get('/', async (req, res) => {
   }
 });
 
-// --- MODIFICATION DU PROFIL (AVEC LIEU ET GPS) ---
+// --- MODIFICATION DU PROFIL (AVEC LIEU ET GPS + SECURITE ANTI-CRASH) ---
 router.get('/profile', async (req, res) => {
   const { rows } = await db.execute({ sql: "SELECT * FROM members WHERE user_id = ?", args: [req.session.user.id] });
   res.render('member/profile', { title: 'Mon Profil', member: rows[0] });
 });
 
 router.post('/profile', upload.single('photo'), async (req, res) => {
-  const { rows } = await db.execute({ sql: "SELECT * FROM members WHERE user_id = ?", args: [req.session.user.id] });
-  const member = rows[0];
-  
-  // On récupère tous les champs, y compris location, latitude et longitude
-  const { name, spec, skills, url, bio, location, latitude, longitude } = req.body;
-  const photoPath = req.file ? req.file.filename : member.photo_path;
+  try {
+    const { rows } = await db.execute({ sql: "SELECT * FROM members WHERE user_id = ?", args: [req.session.user.id] });
+    const member = rows[0];
+    
+    const { name, spec, skills, url, bio, location, latitude, longitude } = req.body;
+    const photoPath = req.file ? req.file.filename : member.photo_path;
 
-  await db.execute({
-    sql: `UPDATE members SET name = ?, spec = ?, skills = ?, url = ?, bio = ?, location = ?, latitude = ?, longitude = ?, photo_path = ? WHERE user_id = ?`,
-    args: [name, spec, skills, url, bio, location, latitude || null, longitude || null, photoPath, req.session.user.id]
-  });
+    await db.execute({
+      sql: `UPDATE members SET name = ?, spec = ?, skills = ?, url = ?, bio = ?, location = ?, latitude = ?, longitude = ?, photo_path = ? WHERE user_id = ?`,
+      args: [name, spec, skills, url, bio, location, latitude || null, longitude || null, photoPath, req.session.user.id]
+    });
 
-  req.flash('success', 'Profil mis à jour avec succès.');
-  res.redirect('/member/profile');
+    req.flash('success', 'Profil mis à jour avec succès.');
+    res.redirect('/member/profile');
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du profil:", error);
+    req.flash('error', 'Une erreur est survenue lors de la sauvegarde. Veuillez réessayer.');
+    res.redirect('/member/profile');
+  }
 });
 
 // --- CHANGEMENT DE MOT DE PASSE ---
@@ -109,7 +114,7 @@ router.get('/receipt/:ref', async (req, res) => {
   res.render('member/receipt', { payment, member, MONTHLY_FEE });
 });
 
-// --- PAIEMENT KKIAPAY (VÉRIFICATION SÉCURISÉE AVEC LE SDK OFFICIEL) ---
+// --- PAIEMENT KKIAPAY ---
 router.post('/pay-kkiapay', async (req, res) => {
   const { transactionId, months } = req.body;
   const { rows: mRows } = await db.execute({ sql: "SELECT * FROM members WHERE user_id = ?", args: [req.session.user.id] });
@@ -126,7 +131,7 @@ router.post('/pay-kkiapay', async (req, res) => {
       privatekey: process.env.KKIA_PRIVATE_KEY,
       publickey: process.env.KKIA_PUBLIC_KEY,
       secretkey: process.env.KKIA_SECRET_KEY,
-      sandbox: true // ⚠️ Passe à "false" en production (vrai argent)
+      sandbox: true 
     });
 
     let kkiaData = null;

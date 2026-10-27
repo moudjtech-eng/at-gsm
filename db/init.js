@@ -16,7 +16,7 @@ async function seedPendingContributions(memberId, debtMonths) {
 }
 
 async function init() {
-  // Création des tables
+  // Création des tables initiales
   await db.execute(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,7 +30,7 @@ async function init() {
     )
   `);
   await db.execute(`
-        CREATE TABLE IF NOT EXISTS members (
+    CREATE TABLE IF NOT EXISTS members (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL UNIQUE,
       name TEXT NOT NULL,
@@ -40,12 +40,11 @@ async function init() {
       url TEXT,
       bio TEXT,
       location TEXT,
-      latitude REAL,    /* <-- AJOUTE CECI */
-      longitude REAL,   /* <-- AJOUTE CECI */
+      latitude REAL,
+      longitude REAL,
       photo_path TEXT,
       debt_months INTEGER NOT NULL DEFAULT 0,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    );
     )
   `);
   await db.execute(`
@@ -95,6 +94,29 @@ async function init() {
     )
   `);
 
+  // ==========================================
+  // MIGRATION : Ajout automatique des nouvelles colonnes si elles n'existent pas
+  // ==========================================
+  try {
+    const tableInfo = await db.execute("PRAGMA table_info(members)");
+    const columns = tableInfo.rows.map(c => c.name);
+
+    if (!columns.includes('location')) {
+      await db.execute("ALTER TABLE members ADD COLUMN location TEXT");
+      console.log("✅ Colonne 'location' ajoutée à la base de données.");
+    }
+    if (!columns.includes('latitude')) {
+      await db.execute("ALTER TABLE members ADD COLUMN latitude REAL");
+      console.log("✅ Colonne 'latitude' ajoutée à la base de données.");
+    }
+    if (!columns.includes('longitude')) {
+      await db.execute("ALTER TABLE members ADD COLUMN longitude REAL");
+      console.log("✅ Colonne 'longitude' ajoutée à la base de données.");
+    }
+  } catch (migrationError) {
+    console.error("Erreur lors de la migration de la base de données:", migrationError);
+  }
+
   // Admin par défaut
   const adminCheck = await db.execute("SELECT id FROM users WHERE email = 'admin@atgsm.bj'");
   if (adminCheck.rows.length === 0) {
@@ -105,7 +127,7 @@ async function init() {
     });
     await db.execute({
       sql: "INSERT INTO members (user_id, name, spec) VALUES (?, 'Administrateur', 'Admin')",
-      args: [r.lastInsertRowid]
+      args: [Number(r.lastInsertRowid)]
     });
     console.log('✅ Admin : admin@atgsm.bj / admin2026');
   }
@@ -127,9 +149,9 @@ async function init() {
       });
       const m = await db.execute({
         sql: "INSERT INTO members (user_id, name, phone, spec, skills, url, bio, debt_months) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        args: [u.lastInsertRowid, dm.name, dm.phone, dm.spec, dm.skills, dm.url, dm.bio, dm.debt]
+        args: [Number(u.lastInsertRowid), dm.name, dm.phone, dm.spec, dm.skills, dm.url, dm.bio, dm.debt]
       });
-      if (dm.debt > 0) await seedPendingContributions(m.lastInsertRowid, dm.debt);
+      if (dm.debt > 0) await seedPendingContributions(Number(m.lastInsertRowid), dm.debt);
       console.log(`✅ Membre : ${dm.email} / ${dm.password}`);
     }
   }
@@ -142,8 +164,7 @@ async function init() {
     await db.execute({ sql: "INSERT INTO news (title, category, content) VALUES (?, ?, ?)", args: ['Assemblée Générale Annuelle', 'Communauté', 'Revue de la croissance et planification.'] });
   }
 
-  console.log('✅ Base de données initialisée');
+  console.log('✅ Base de données initialisée et à jour');
 }
 
-// On lance l'initialisation
 init().catch(console.error);
