@@ -110,4 +110,9 @@ router.get('/news/:id', async (req, res) => {
   }
 });
 
+// --- PAGE À PROPOS ---
+router.get('/about', (req, res) => {
+  res.render('about', { title: 'À propos de nous' });
+});
+
 module.exports = router;

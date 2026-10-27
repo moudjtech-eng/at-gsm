@@ -1,0 +1,70 @@
+<%- include('partials/header') %>
+
+<!-- HERO SECTION -->
+<div class="relative bg-dark rounded-3xl overflow-hidden mb-12 py-20 px-6 text-center text-white">
+  <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1581092921461-e777640d82fc?auto=format&fit=crop&q=80&w=1200')] bg-cover bg-center"></div>
+  <div class="relative z-10 max-w-3xl mx-auto">
+    <h1 class="text-4xl md:text-6xl font-extrabold mb-6 animate-fade-in-up">Nous sommes les <span class="text-primary">Artisans</span> de la Réparation Mobile</h1>
+    <p class="text-lg md:text-xl text-slate-300">Découvrez l'association qui unit les talents de Bohicon pour repousser les limites de la technologie GSM.</p>
+  </div>
+</div>
+
+<!-- NOTRE MISSION -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
+  <div>
+    <h2 class="text-3xl font-bold mb-4">Notre Mission</h2>
+    <p class="text-slate-600 leading-relaxed mb-4">
+      L'Association des Techniciens GSM (AT-GSM) de Bohicon est née d'une vision simple : créer un réseau solide de professionnels certifiés pour garantir des réparations de haute qualité à tous les habitants.
+    </p>
+    <p class="text-slate-600 leading-relaxed">
+      Nous ne sommes pas de simples réparateurs. Nous sommes des experts en micro-électronique, en logiciels complexes, et en diagnostic avancé. Notre but est de professionnaliser le métier et de partager notre savoir-faire.
+    </p>
+    <div class="mt-6 flex gap-4">
+      <a href="/directory" class="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-red-700 transition-colors">Trouver un Expert</a>
+      <a href="/apply" class="bg-slate-200 text-slate-800 px-6 py-3 rounded-xl font-bold hover:bg-slate-300 transition-colors">Rejoindre l'Association</a>
+    </div>
+  </div>
+  <div class="relative">
+    <img src="https://images.unsplash.com/photo-1597740985779-402a39eb1784?auto=format&fit=crop&q=80&w=800" class="rounded-2xl shadow-2xl animate-float" alt="Technicien au travail">
+    <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-xl border border-slate-100 hidden md:block">
+      <p class="text-3xl font-extrabold text-primary">100%</p>
+      <p class="text-sm font-bold text-slate-600">Engagement Qualité</p>
+    </div>
+  </div>
+</div>
+
+<!-- NOS DOMAINES D'EXPERTISE -->
+<div class="mb-16">
+  <div class="text-center mb-10">
+    <h2 class="text-3xl font-bold mb-2">Ce que nous faisons de mieux</h2>
+    <p class="text-slate-600">La technologie GSM n'a plus de secret pour nous.</p>
+  </div>
+  
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-2">
+      <div class="w-14 h-14 bg-red-50 text-primary rounded-xl flex items-center justify-center mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+      </div>
+      <h3 class="text-xl font-bold mb-3">Micro-Soudure</h3>
+      <p class="text-slate-600 text-sm">Remplacement de composants IC, réparation de pistes de cartes mères sous microscope haute résolution.</p>
+    </div>
+
+    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-2">
+      <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+      </div>
+      <h3 class="text-xl font-bold mb-3">Logiciel & Déblocage</h3>
+      <p class="text-slate-600 text-sm">Flashage système, déblocage FRP, mises à jour d'OS et récupération de données complexes.</p>
+    </div>
+
+    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-2">
+      <div class="w-14 h-14 bg-green-50 text-green-600 rounded-xl flex items-center justify-center mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+      </div>
+      <h3 class="text-xl font-bold mb-3">Diagnostic Matériel</h3>
+      <p class="text-slate-600 text-sm">Recherche de courts-circuits, analyse de pannes, remplacement d'écrans OLED et batteries certifiées.</p>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

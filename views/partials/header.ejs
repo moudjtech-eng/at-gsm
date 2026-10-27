@@ -5,54 +5,89 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %> | AT-GSM Bohicon</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { theme: { extend: { colors: { primary: '#dc2626', dark: '#0f172a' } } } }</script>
+  <script>
+    tailwind.config = { 
+      theme: { 
+        extend: { 
+          colors: { primary: '#dc2626', dark: '#0f172a' },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+            'float': 'float 6s ease-in-out infinite',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            }
+          }
+        } 
+      } 
+    }
+  </script>
   <script src="https://cdn.kkiapay.me/k.js"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0;
+      background-color: #dc2626; transition: width 0.3s;
+    }
+    .nav-link:hover::after { width: 100%; }
+  </style>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex flex-col">
 
-<nav class="bg-dark text-white shadow-lg sticky top-0 z-50">
+<nav class="bg-dark/95 backdrop-blur-md text-white sticky top-0 z-50 border-b border-white/10 shadow-lg">
   <div class="max-w-7xl mx-auto px-4">
-    <div class="flex items-center justify-between h-16">
+    <div class="flex items-center justify-between h-20">
       
-      <!-- TON LOGO ICI -->
-      <a href="/" class="flex items-center gap-3">
-        <!-- L'image vient de public/images/logo.png -->
-        <img src="/images/logo.png" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIj48cGF0aCBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGQ9Ik0xMiAxOGguMDFNOCAyMWg4YTIgMiAwIDAwMi0yVjVhMiAyIDAgMDAtMi0ySDhhMiAyIDAgMDAtMiAydjE0YTIgMiAwIDAwMiAyeiIgLz48L3N2Zz4=' " class="h-10 w-auto object-contain" alt="Logo">
-        <span class="font-bold text-xl hidden sm:block">AT-GSM <span class="text-primary">Bohicon</span></span>
+      <!-- LOGO -->
+      <a href="/" class="flex items-center gap-3 group">
+        <div class="bg-primary/10 p-2 rounded-xl group-hover:bg-primary/20 transition-all">
+          <img src="/images/logo.png" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIj48cGF0aCBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGQ9Ik0xMiAxOGguMDFNOCAyMWg4YTIgMiAwIDAwMi0yVjVhMiAyIDAgMDAtMi0ySDhhMiAyIDAgMDAtMiAydjE0YTIgMiAwIDAwMiAyeiIgLz48L3N2Zz4='" class="h-8 w-auto object-contain" alt="Logo">
+        </div>
+        <span class="font-extrabold text-2xl tracking-tight hidden sm:block">AT-GSM <span class="text-primary">Bohicon</span></span>
       </a>
 
-      <div class="hidden md:flex items-center space-x-3">
-        <a href="/" class="hover:text-primary px-2 py-2 text-sm font-medium">Accueil</a>
-        <a href="/directory" class="hover:text-primary px-2 py-2 text-sm font-medium">Annuaire</a>
+      <!-- MENU DESKTOP -->
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="/" class="nav-link px-2 py-2 text-sm font-semibold hover:text-primary transition-colors">Accueil</a>
+        <a href="/about" class="nav-link px-2 py-2 text-sm font-semibold hover:text-primary transition-colors">À propos</a>
+        <a href="/directory" class="nav-link px-2 py-2 text-sm font-semibold hover:text-primary transition-colors">Annuaire</a>
         <% if (user) { %>
-          <a href="<%= user.role === 'admin' ? '/admin' : '/member' %>" class="hover:text-primary px-2 py-2 text-sm font-medium">
-            <%= user.role === 'admin' ? 'Admin' : 'Mon Espace' %>
+          <a href="<%= user.role === 'admin' ? '/admin' : '/member' %>" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-bold transition-all">
+            <%= user.role === 'admin' ? 'Panel Admin' : 'Mon Espace' %>
           </a>
-          <form action="/auth/logout" method="POST"><button class="text-red-400 hover:text-red-300 px-2 py-2 text-sm font-medium">Déconnexion</button></form>
+          <form action="/auth/logout" method="POST"><button class="text-red-400 hover:text-red-300 font-semibold text-sm transition-colors">Déconnexion</button></form>
         <% } else { %>
-          <a href="/apply" class="hover:text-primary px-2 py-2 text-sm font-medium">Postuler</a>
-          <a href="/auth/login" class="bg-primary hover:bg-red-700 px-4 py-2 rounded-lg text-sm font-bold">Connexion</a>
+          <a href="/auth/login" class="bg-primary hover:bg-red-700 px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary/30 transition-all transform hover:-translate-y-0.5">Connexion</a>
         <% } %>
       </div>
 
-      <button id="menu-btn" class="md:hidden p-2 rounded-lg hover:bg-slate-800">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+      <!-- BOUTON MOBILE -->
+      <button id="menu-btn" class="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
       </button>
     </div>
   </div>
 
-  <div id="mobile-menu" class="hidden md:hidden bg-dark border-t border-slate-800">
-    <div class="px-2 pt-2 pb-4 space-y-1">
-      <a href="/" class="block hover:text-primary px-3 py-2 rounded-md text-base font-medium">Accueil</a>
-      <a href="/directory" class="block hover:text-primary px-3 py-2 rounded-md text-base font-medium">Annuaire</a>
+  <!-- MENU MOBILE -->
+  <div id="mobile-menu" class="hidden md:hidden bg-dark border-t border-white/10 absolute w-full">
+    <div class="px-4 pt-2 pb-6 space-y-2">
+      <a href="/" class="block hover:text-primary px-3 py-3 rounded-lg text-base font-semibold hover:bg-white/5">Accueil</a>
+      <a href="/about" class="block hover:text-primary px-3 py-3 rounded-lg text-base font-semibold hover:bg-white/5">À propos</a>
+      <a href="/directory" class="block hover:text-primary px-3 py-3 rounded-lg text-base font-semibold hover:bg-white/5">Annuaire</a>
       <% if (user) { %>
-        <a href="<%= user.role === 'admin' ? '/admin' : '/member' %>" class="block hover:text-primary px-3 py-2 rounded-md text-base font-medium">
-          <%= user.role === 'admin' ? 'Admin' : 'Mon Espace' %>
+        <a href="<%= user.role === 'admin' ? '/admin' : '/member' %>" class="block text-primary font-bold px-3 py-3 rounded-lg bg-white/5">
+          <%= user.role === 'admin' ? 'Panel Admin' : 'Mon Espace' %>
         </a>
-        <form action="/auth/logout" method="POST"><button class="w-full text-left text-red-400 hover:text-red-300 px-3 py-2 rounded-md text-base font-medium">Déconnexion</button></form>
+        <form action="/auth/logout" method="POST"><button class="w-full text-left text-red-400 px-3 py-3 rounded-lg font-semibold hover:bg-white/5">Déconnexion</button></form>
       <% } else { %>
-        <a href="/apply" class="block hover:text-primary px-3 py-2 rounded-md text-base font-medium">Postuler</a>
-        <a href="/auth/login" class="block text-primary font-bold px-3 py-2 rounded-md text-base">Connexion</a>
+        <a href="/auth/login" class="block text-white bg-primary px-3 py-3 rounded-lg text-base font-bold text-center mt-4">Connexion</a>
       <% } %>
     </div>
   </div>
@@ -66,10 +101,10 @@
 
 <% const allFlash = [...flash.success, ...flash.error, ...flash.info]; %>
 <% if (allFlash.length) { %>
-  <div class="fixed top-20 right-4 z-[100] space-y-2 max-w-sm">
-    <% flash.success.forEach(m => { %><div class="bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg text-sm font-medium"><%= m %></div><% }) %>
-    <% flash.error.forEach(m => { %><div class="bg-red-600 text-white px-4 py-3 rounded-xl shadow-lg text-sm font-medium"><%= m %></div><% }) %>
-    <% flash.info.forEach(m => { %><div class="bg-slate-800 text-white px-4 py-3 rounded-xl shadow-lg text-sm font-medium"><%= m %></div><% }) %>
+  <div class="fixed top-24 right-4 z-[100] space-y-2 max-w-sm animate-fade-in-up">
+    <% flash.success.forEach(m => { %><div class="bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg text-sm font-medium border-l-4 border-green-800"><%= m %></div><% }) %>
+    <% flash.error.forEach(m => { %><div class="bg-red-600 text-white px-4 py-3 rounded-xl shadow-lg text-sm font-medium border-l-4 border-red-800"><%= m %></div><% }) %>
+    <% flash.info.forEach(m => { %><div class="bg-slate-800 text-white px-4 py-3 rounded-xl shadow-lg text-sm font-medium border-l-4 border-slate-600"><%= m %></div><% }) %>
   </div>
 <% } %>
 

@@ -1,102 +1,148 @@
 <%- include('partials/header') %>
 
-<div class="relative overflow-hidden rounded-3xl bg-dark text-white shadow-2xl min-h-[400px] md:min-h-[500px] flex items-center mb-12">
+<!-- HERO SECTION ANIMÉE -->
+<div class="relative overflow-hidden rounded-3xl bg-dark text-white shadow-2xl min-h-[500px] flex items-center mb-16 border border-slate-800">
   <div id="hero-carousel" class="absolute inset-0 w-full h-full">
     <div class="carousel-item active relative w-full h-full">
-      <img src="/images/slide1.jpg" onerror="this.src='https://images.unsplash.com/photo-1512428559087-565658d65721?auto=format&fit=crop&q=80&w=1200'" class="w-full h-full object-cover opacity-40" alt="Slide 1">
-      <div class="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent"></div>
+      <img src="/images/slide1.jpg" onerror="this.src='https://images.unsplash.com/photo-1512428559087-565658d65721?auto=format&fit=crop&q=80&w=1200'" class="w-full h-full object-cover opacity-30" alt="Slide 1">
+      <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/80 to-transparent"></div>
     </div>
     <div class="carousel-item relative w-full h-full">
-      <img src="/images/slide2.jpg" onerror="this.src='https://images.unsplash.com/photo-1581092921461-e777640d82fc?auto=format&fit=crop&q=80&w=1200'" class="w-full h-full object-cover opacity-40" alt="Slide 2">
-      <div class="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent"></div>
+      <img src="/images/slide2.jpg" onerror="this.src='https://images.unsplash.com/photo-1581092921461-e777640d82fc?auto=format&fit=crop&q=80&w=1200'" class="w-full h-full object-cover opacity-30" alt="Slide 2">
+      <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/80 to-transparent"></div>
     </div>
   </div>
   
-  <div class="relative z-10 max-w-3xl mx-auto px-8 py-20 text-center">
-    <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-6">Élever l'Excellence GSM à <span class="text-primary">Bohicon</span></h1>
-    <p class="text-lg md:text-xl text-slate-300 mb-10">L'association officielle des techniciens GSM professionnels.</p>
-    <div class="flex flex-col sm:flex-row justify-center gap-4">
-      <a href="/directory" class="bg-primary hover:bg-red-700 px-8 py-3 rounded-full font-bold">Trouver un Technicien</a>
-      <a href="/apply" class="bg-white/10 hover:bg-white/20 border border-white/20 px-8 py-3 rounded-full font-bold">Rejoindre</a>
+  <div class="relative z-10 max-w-4xl mx-auto px-8 py-20 text-center">
+    <span class="bg-primary/20 text-primary font-bold px-4 py-1 rounded-full text-sm uppercase tracking-widest mb-6 inline-block animate-fade-in-up">Association des Techniciens GSM</span>
+    <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-6 animate-fade-in-up" style="animation-delay: 0.1s;">
+      L'Excellence à <span class="text-primary">Bohicon</span>
+    </h1>
+    <p class="text-lg md:text-xl text-slate-300 mb-10 max-w-2xl mx-auto animate-fade-in-up" style="animation-delay: 0.2s;">
+      Unissez-vous à l'élite des techniciens. Nous réparons, innovons et formons pour garantir la qualité technologique dans notre communauté.
+    </p>
+    <div class="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in-up" style="animation-delay: 0.3s;">
+      <a href="/directory" class="bg-primary hover:bg-red-700 text-white px-10 py-4 rounded-full font-bold text-lg transition-transform transform hover:scale-105 shadow-lg shadow-primary/50">Trouver un Technicien</a>
+      <a href="/apply" class="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white px-10 py-4 rounded-full font-bold text-lg transition-transform transform hover:scale-105">Rejoindre l'Association</a>
     </div>
   </div>
 </div>
 
-<div class="bg-slate-900 rounded-3xl p-8 md:p-12 mb-12 text-center shadow-xl relative overflow-hidden">
+<!-- SECTION STATISTIQUES -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+    <p class="text-4xl font-extrabold text-primary mb-1">50+</p>
+    <p class="text-sm font-bold text-slate-500 uppercase">Techniciens</p>
+  </div>
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+    <p class="text-4xl font-extrabold text-primary mb-1">1000+</p>
+    <p class="text-sm font-bold text-slate-500 uppercase">Réparations</p>
+  </div>
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+    <p class="text-4xl font-extrabold text-primary mb-1">100%</p>
+    <p class="text-sm font-bold text-slate-500 uppercase">Satisfaction</p>
+  </div>
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center transform hover:-translate-y-1 transition-transform">
+    <p class="text-4xl font-extrabold text-primary mb-1">24/7</p>
+    <p class="text-sm font-bold text-slate-500 uppercase">Support</p>
+  </div>
+</div>
+
+<!-- SECTION NOS EXPERTISES -->
+<div class="mb-16">
+  <div class="text-center mb-10">
+    <h2 class="text-3xl md:text-4xl font-bold text-dark mb-4">Pourquoi nous choisir ?</h2>
+    <p class="text-slate-600 max-w-2xl mx-auto">Nos membres sont formés aux techniques les plus pointues pour redonner vie à vos appareils.</p>
+  </div>
+  
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-white p-8 rounded-3xl border border-slate-200 hover:border-primary/50 transition-all group">
+      <div class="w-16 h-16 bg-red-50 text-primary rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+      </div>
+      <h3 class="text-xl font-bold mb-3">Micro-Soudure de Précision</h3>
+      <p class="text-slate-600 text-sm">Nos experts manipulent les composants électroniques les plus fins pour sauver des cartes mères déclarées "mortes".</p>
+    </div>
+    <div class="bg-white p-8 rounded-3xl border border-slate-200 hover:border-primary/50 transition-all group">
+      <div class="w-16 h-16 bg-red-50 text-primary rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+      </div>
+      <h3 class="text-xl font-bold mb-3">Logiciel & Déblocage</h3>
+      <p class="text-slate-600 text-sm">Flashage, récupération de données perdues, déblocage de comptes et installation de systèmes d'exploitation.</p>
+    </div>
+    <div class="bg-white p-8 rounded-3xl border border-slate-200 hover:border-primary/50 transition-all group">
+      <div class="w-16 h-16 bg-red-50 text-primary rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+      </div>
+      <h3 class="text-xl font-bold mb-3">Remplacement Matériel</h3>
+      <p class="text-slate-600 text-sm">Installation d'écrans originaux, de batteries de haute capacité et de connecteurs de charge certifiés.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION HOMMAGE À EDJO -->
+<div class="bg-slate-900 rounded-3xl p-8 md:p-12 mb-16 text-center shadow-xl relative overflow-hidden border border-slate-800">
   <div class="absolute inset-0 opacity-5 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white via-slate-400 to-transparent"></div>
   <div class="relative z-10 max-w-2xl mx-auto">
-    <div class="mx-auto w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mb-6 text-slate-300">
+    <div class="mx-auto w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mb-6 text-primary">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
     </div>
     <h2 class="text-2xl md:text-3xl font-bold text-white mb-4 tracking-wide">En mémoire de notre frère</h2>
     <p class="text-slate-300 text-lg mb-2 italic">"Ceux qu'on aime ne meurent jamais, ils vivent dans nos cœurs."</p>
-    <p class="text-slate-400 text-sm mt-4">L'Association AT-GSM Bohicon rend un vibrant hommage à <strong class="text-white">Edjo</strong>, un membre regretté qui a marqué notre communauté. Son héritage et sa passion pour le métier resteront à jamais gravés dans nos mémoires.</p>
+    <p class="text-slate-400 text-sm mt-4">L'Association AT-GSM Bohicon rend un vibrant hommage à <strong class="text-primary">Edjo</strong>, un membre regretté qui a marqué notre communauté. Son héritage et sa passion pour le métier resteront à jamais gravés dans nos mémoires.</p>
     <div class="mt-6 flex justify-center">
       <span class="px-4 py-1 border border-slate-700 text-slate-400 rounded-full text-xs uppercase tracking-widest font-bold">Repose en paix</span>
     </div>
   </div>
 </div>
 
-<style>
-  .carousel-item { display: none; }
-  .carousel-item.active { display: block; animation: fadeIn 1s; }
-  @keyframes fadeIn { from { opacity: 0.5; } to { opacity: 1; } }
-</style>
-<script>
-  let currentSlide = 0;
-  const slides = document.querySelectorAll('.carousel-item');
-  setInterval(() => {
-    slides[currentSlide].classList.remove('active');
-    currentSlide = (currentSlide + 1) % slides.length;
-    slides[currentSlide].classList.add('active');
-  }, 5000);
-</script>
-
-<h2 class="text-3xl font-bold mb-6">Nos Projets & Actualités</h2>
-<% if (!news.length) { %>
-  <p class="text-slate-500 italic">Aucune actualité pour le moment.</p>
-<% } else { %>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-    <% news.forEach(n => { %>
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
-        
-        <!-- IMAGE DE COUVERTURE -->
-        <div class="h-48 bg-slate-100 relative overflow-hidden shrink-0">
-          <% if (n.image_path) { %>
-            <img src="/uploads/<%= n.image_path %>" onerror="this.src='https://images.unsplash.com/photo-1581092921461-e777640d82fc?auto=format&fit=crop&q=80&w=400'" class="w-full h-full object-cover">
-          <% } else { %>
-            <img src="https://images.unsplash.com/photo-1512428559087-565658d65721?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover">
-          <% } %>
-          <span class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-slate-800">
-            <%= new Date(n.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) %>
-          </span>
-        </div>
-
-        <!-- CONTENU -->
-        <div class="p-6 flex flex-col flex-1">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 bg-red-100 text-red-700 rounded"><%= n.category %></span>
-          </div>
-          <h3 class="text-xl font-bold mb-2 leading-tight"><%= n.title %></h3>
-          <p class="text-slate-600 text-sm mb-4 line-clamp-3"><%= n.content %></p>
-          
-          <!-- AUTEUR ET BOUTON -->
-          <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                <%= n.author ? n.author.charAt(0).toUpperCase() : 'A' %>
-              </div>
-              <div>
-                <p class="text-[10px] text-slate-400 font-bold uppercase">Auteur</p>
-                <p class="text-xs font-bold text-slate-700 truncate max-w-[100px]"><%= n.author || 'Admin' %></p>
-              </div>
-            </div>
-            <a href="/news/<%= n.id %>" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors">Lire la suite</a>
-          </div>
-        </div>
-      </div>
-    <% }) %>
+<!-- SECTION ACTUALITÉS -->
+<div class="mb-12">
+  <div class="flex items-center justify-between mb-8">
+    <h2 class="text-3xl font-bold text-dark">Nos Projets & Actualités</h2>
+    <a href="/about" class="text-primary font-bold hover:underline hidden md:block">En savoir plus sur nous</a>
   </div>
-<% } %>
+  
+  <% if (!news.length) { %>
+    <p class="text-slate-500 italic">Aucune actualité pour le moment.</p>
+  <% } else { %>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <% news.forEach(n => { %>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl transition-all group flex flex-col transform hover:-translate-y-1">
+          <div class="h-48 bg-slate-100 relative overflow-hidden shrink-0">
+            <% if (n.image_path) { %>
+              <img src="/uploads/<%= n.image_path %>" onerror="this.src='https://images.unsplash.com/photo-1581092921461-e777640d82fc?auto=format&fit=crop&q=80&w=400'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            <% } else { %>
+              <img src="https://images.unsplash.com/photo-1512428559087-565658d65721?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            <% } %>
+            <span class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-slate-800">
+              <%= new Date(n.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+            </span>
+          </div>
+          <div class="p-6 flex flex-col flex-1">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 bg-primary/10 text-primary rounded"><%= n.category %></span>
+            </div>
+            <h3 class="text-xl font-bold mb-2 leading-tight group-hover:text-primary transition-colors"><%= n.title %></h3>
+            <p class="text-slate-600 text-sm mb-4 line-clamp-3"><%= n.content %></p>
+            
+            <div class="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-dark flex items-center justify-center text-white font-bold text-xs">
+                  <%= n.author ? n.author.charAt(0).toUpperCase() : 'A' %>
+                </div>
+                <div>
+                  <p class="text-[10px] text-slate-400 font-bold uppercase">Auteur</p>
+                  <p class="text-xs font-bold text-slate-700 truncate max-w-[100px]"><%= n.author || 'Admin' %></p>
+                </div>
+              </div>
+              <a href="/news/<%= n.id %>" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors">Lire la suite</a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
 
 <%- include('partials/footer') %>
