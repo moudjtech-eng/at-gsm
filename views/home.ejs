@@ -11,11 +11,6 @@
     opacity: 1;
     transform: translateY(0);
   }
-  .countdown-box {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
 </style>
 
 <!-- HERO SECTION ANIMÉE -->
@@ -46,7 +41,7 @@
   </div>
 </div>
 
-<!-- COMPTE A REBOURS (NOUVEAU) -->
+<!-- COMPTE A REBOURS (SANS LES BOITES NOIRES) -->
 <div class="reveal bg-dark rounded-3xl p-6 md:p-10 mb-16 shadow-2xl border border-slate-800 relative overflow-hidden">
   <div class="absolute -top-20 -right-20 w-64 h-64 bg-primary opacity-20 rounded-full blur-3xl"></div>
   <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
@@ -55,23 +50,23 @@
       <p class="text-slate-400">Ne manquez pas le grand rassemblement des techniciens de Bohicon.</p>
     </div>
     
-    <!-- Les boîtes du compte à rebours -->
-    <div class="flex gap-3 md:gap-4 text-center">
-      <div class="countdown-box rounded-2xl p-3 md:p-4 min-w-[70px] md:min-w-[90px]">
-        <span id="days" class="block text-3xl md:text-5xl font-black text-white">00</span>
-        <span class="text-[10px] md:text-xs text-primary font-bold uppercase tracking-wider">Jours</span>
+    <!-- Les chiffres du compte à rebours -->
+    <div class="flex gap-6 md:gap-10 text-center">
+      <div class="flex flex-col items-center">
+        <span id="days" class="text-4xl md:text-6xl font-black text-white">00</span>
+        <span class="text-[10px] md:text-xs text-primary font-bold uppercase tracking-widest mt-1">Jours</span>
       </div>
-      <div class="countdown-box rounded-2xl p-3 md:p-4 min-w-[70px] md:min-w-[90px]">
-        <span id="hours" class="block text-3xl md:text-5xl font-black text-white">00</span>
-        <span class="text-[10px] md:text-xs text-primary font-bold uppercase tracking-wider">Heures</span>
+      <div class="flex flex-col items-center">
+        <span id="hours" class="text-4xl md:text-6xl font-black text-white">00</span>
+        <span class="text-[10px] md:text-xs text-primary font-bold uppercase tracking-widest mt-1">Heures</span>
       </div>
-      <div class="countdown-box rounded-2xl p-3 md:p-4 min-w-[70px] md:min-w-[90px]">
-        <span id="minutes" class="block text-3xl md:text-5xl font-black text-white">00</span>
-        <span class="text-[10px] md:text-xs text-primary font-bold uppercase tracking-wider">Min</span>
+      <div class="flex flex-col items-center">
+        <span id="minutes" class="text-4xl md:text-6xl font-black text-white">00</span>
+        <span class="text-[10px] md:text-xs text-primary font-bold uppercase tracking-widest mt-1">Min</span>
       </div>
-      <div class="countdown-box rounded-2xl p-3 md:p-4 min-w-[70px] md:min-w-[90px]">
-        <span id="seconds" class="block text-3xl md:text-5xl font-black text-primary">00</span>
-        <span class="text-[10px] md:text-xs text-primary font-bold uppercase tracking-wider">Sec</span>
+      <div class="flex flex-col items-center">
+        <span id="seconds" class="text-4xl md:text-6xl font-black text-white">00</span>
+        <span class="text-[10px] md:text-xs text-primary font-bold uppercase tracking-widest mt-1">Sec</span>
       </div>
     </div>
   </div>
@@ -213,7 +208,6 @@
   }
 
   // 2. COMPTE A REBOURS (Cible : 31 Décembre 2026 à 23:59:59)
-  // Tu peux changer cette date pour la prochaine AG
   const targetDate = new Date("December 31, 2026 23:59:59").getTime();
 
   const countdownInterval = setInterval(function() {
@@ -248,7 +242,7 @@
       }
     });
   }, {
-    threshold: 0.1 // Déclenche l'animation quand 10% de la section est visible
+    threshold: 0.1
   });
 
   document.querySelectorAll('.reveal').forEach((el) => {
