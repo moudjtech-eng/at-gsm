@@ -1,0 +1,100 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-4xl mx-auto pb-10">
+  
+  <!-- BOUTONS D'ACTION (Non imprimables) -->
+  <div class="flex justify-between items-center mb-6 print:hidden">
+    <a href="/admin/finances" class="text-slate-500 hover:text-dark font-bold flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+      Retour aux finances
+    </a>
+    <button onclick="window.print()" class="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-red-700 flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+      Imprimer / Enregistrer en PDF
+    </button>
+  </div>
+
+  <!-- LA FEUILLE DE RELEVÉ -->
+  <div class="bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-slate-200 print:shadow-none print:border-none print:p-0">
+    
+    <!-- En-tête -->
+    <div class="flex justify-between items-start border-b-2 border-slate-800 pb-6 mb-8">
+      <div>
+        <h1 class="text-3xl font-black text-slate-900">AT-GSM Bohicon</h1>
+        <p class="text-slate-500 font-medium">Association des Techniciens GSM</p>
+      </div>
+      <div class="text-right">
+        <h2 class="text-xl font-bold text-slate-800 uppercase tracking-widest">Relevé de Compte</h2>
+        <p class="text-slate-500 text-sm mt-1">Généré le : <strong><%= date %></strong></p>
+      </div>
+    </div>
+
+    <!-- Résumé Comptable -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 print:bg-transparent">
+        <p class="text-[10px] uppercase font-bold text-slate-500">Solde Initial</p>
+        <p class="text-lg font-bold text-slate-800"><%= initialBalance.toLocaleString('fr-FR') %> F</p>
+      </div>
+      <div class="bg-green-50 p-4 rounded-xl border border-green-200 print:bg-transparent">
+        <p class="text-[10px] uppercase font-bold text-green-600">Total Entrées (+)</p>
+        <p class="text-lg font-bold text-green-700">+<%= totalIn.toLocaleString('fr-FR') %> F</p>
+      </div>
+      <div class="bg-red-50 p-4 rounded-xl border border-red-200 print:bg-transparent">
+        <p class="text-[10px] uppercase font-bold text-red-600">Total Sorties (-)</p>
+        <p class="text-lg font-bold text-red-700">-<%= totalOut.toLocaleString('fr-FR') %> F</p>
+      </div>
+      <div class="bg-slate-800 p-4 rounded-xl border border-slate-900 text-white print:bg-slate-100 print:text-black">
+        <p class="text-[10px] uppercase font-bold opacity-80">Solde Actuel</p>
+        <p class="text-lg font-black"><%= currentBalance.toLocaleString('fr-FR') %> F</p>
+      </div>
+    </div>
+
+    <!-- Tableau des transactions -->
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="bg-slate-100 print:bg-transparent border-b border-slate-300">
+          <th class="py-3 px-2 text-left font-bold text-slate-700">Date</th>
+          <th class="py-3 px-2 text-left font-bold text-slate-700">Type</th>
+          <th class="py-3 px-2 text-left font-bold text-slate-700">Détails / Membre</th>
+          <th class="py-3 px-2 text-right font-bold text-slate-700">Entrée</th>
+          <th class="py-3 px-2 text-right font-bold text-slate-700">Sortie</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 print:divide-slate-300">
+        <% if (!transactions.length) { %>
+          <tr><td colspan="5" class="py-8 text-center text-slate-500 italic">Aucune transaction enregistrée.</td></tr>
+        <% } %>
+        <% transactions.forEach(t => { %>
+          <tr>
+            <td class="py-3 px-2 text-slate-600 whitespace-nowrap"><%= new Date(t.created_at).toLocaleDateString('fr-FR') %></td>
+            <td class="py-3 px-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase <%= t.type === 'Retrait' ? 'bg-red-100 text-red-700' : t.type === 'Adhésion' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' %>">
+                <%= t.type %>
+              </span>
+            </td>
+            <td class="py-3 px-2 font-medium text-slate-800"><%= t.name %></td>
+            
+            <!-- Colonne Entrée -->
+            <td class="py-3 px-2 text-right font-bold text-green-600">
+              <%= t.type !== 'Retrait' ? Number(t.amount).toLocaleString('fr-FR') + ' F' : '' %>
+            </td>
+            
+            <!-- Colonne Sortie -->
+            <td class="py-3 px-2 text-right font-bold text-red-600">
+              <%= t.type === 'Retrait' ? Number(t.amount).toLocaleString('fr-FR') + ' F' : '' %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <!-- Pied de page -->
+    <div class="mt-12 pt-6 border-t border-slate-200 text-center text-xs text-slate-400">
+      <p>Document généré automatiquement par le système de gestion AT-GSM Bohicon.</p>
+      <p>Les montants sont exprimés en Francs CFA (FCFA).</p>
+    </div>
+
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

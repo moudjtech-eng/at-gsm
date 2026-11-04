@@ -281,5 +281,51 @@ router.get('/receipt/:ref', async (req, res) => {
   res.render('member/receipt', { payment: rows[0], member: { name: rows[0].name, spec: rows[0].spec, phone: rows[0].phone }, MONTHLY_FEE: 500 });
 });
 
+// --- GÉNÉRER LE RELEVÉ BANCAIRE ---
+router.get('/finances/statement', async (req, res) => {
+  try {
+    // On récupère toutes les entrées d'argent (Cotisations payées + Adhésions payées)
+    const { rows: cotisations } = await db.execute(`
+      SELECT 'Cotisation' as type, m.name, p.amount, p.created_at, p.status 
+      FROM payment_requests p JOIN members m ON p.member_id = m.id 
+      WHERE p.status = 'validated'
+    `);
+    const { rows: adhesions } = await db.execute(`
+      SELECT 'Adhésion' as type, name, adhesion_fee as amount, created_at, 'validated' as status 
+      FROM applications WHERE transaction_ref IS NOT NULL
+    `);
+    // On récupère les sorties d'argent (Dépenses)
+    const { rows: expenses } = await db.execute(`
+      SELECT 'Retrait' as type, reason as name, amount, created_at, 'validated' as status 
+      FROM expenses
+    `);
+
+    // On fusionne tout et on trie par date
+    let allTransactions = [...cotisations, ...adhesions, ...expenses];
+    allTransactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    // Calcul des totaux
+    const totalIn = allTransactions.filter(t => t.type !== 'Retrait').reduce((sum, t) => sum + Number(t.amount), 0);
+    const totalOut = allTransactions.filter(t => t.type === 'Retrait').reduce((sum, t) => sum + Number(t.amount), 0);
+    
+    const { rows: s1 } = await db.execute("SELECT value FROM settings WHERE key = 'initial_balance'");
+    const initialBalance = s1.length > 0 ? Number(s1[0].value) : 0;
+    const currentBalance = initialBalance + totalIn - totalOut;
+
+    res.render('admin/statement', { 
+      title: 'Relevé de Compte', 
+      transactions: allTransactions,
+      totalIn,
+      totalOut,
+      initialBalance,
+      currentBalance,
+      date: new Date().toLocaleDateString('fr-FR')
+    });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin/finances');
+  }
+});
+
 // --- LIGNE MAGIQUE QUI MANQUAIT ---
 module.exports = router;
