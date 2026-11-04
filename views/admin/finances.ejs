@@ -1,21 +1,21 @@
 <%- include('../partials/header') %>
 <h1 class="text-2xl md:text-3xl font-bold mb-6">Tableau de Bord Financier</h1>
 
-<!-- CARTES DE STATISTIQUES -->
+<!-- CARTES DE STATISTIQUES (NOUVEAU) -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
   <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
     <p class="text-slate-500 text-xs uppercase font-bold mb-1">Solde Actuel de la Caisse</p>
-    <p class="text-3xl md:text-4xl font-black text-green-600"><%= currentBalance.toLocaleString('fr-FR') %> FCFA</p>
+    <p class="text-3xl md:text-4xl font-black text-green-600"><%= currentBalance ? currentBalance.toLocaleString('fr-FR') : 0 %> FCFA</p>
   </div>
   
   <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
     <p class="text-slate-500 text-xs uppercase font-bold mb-1">Total des Revenus (Cotisations + Adhésions)</p>
-    <p class="text-2xl font-extrabold text-blue-600"><%= totalRevenue.toLocaleString('fr-FR') %> FCFA</p>
+    <p class="text-2xl font-extrabold text-blue-600"><%= totalRevenue ? totalRevenue.toLocaleString('fr-FR') : 0 %> FCFA</p>
   </div>
   
   <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
     <p class="text-slate-500 text-xs uppercase font-bold mb-1">Total des Dépenses / Retraits</p>
-    <p class="text-2xl font-extrabold text-red-600"><%= totalExpenses.toLocaleString('fr-FR') %> FCFA</p>
+    <p class="text-2xl font-extrabold text-red-600"><%= totalExpenses ? totalExpenses.toLocaleString('fr-FR') : 0 %> FCFA</p>
   </div>
 </div>
 
@@ -23,9 +23,9 @@
   <!-- CONFIGURATION DU SOLDE INITIAL -->
   <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
     <h2 class="text-xl font-bold mb-4">⚙️ Configuration de la Caisse</h2>
-    <p class="text-sm text-slate-600 mb-4">Entrez la somme que l'association possédait en caisse <strong>avant</strong> la création du site. Cela permet d'équilibrer les comptes.</p>
+    <p class="text-sm text-slate-600 mb-4">Entrez la somme que l'association possédait en caisse <strong>avant</strong> la création du site.</p>
     <form action="/admin/finances/initial-balance" method="POST" class="flex gap-2">
-      <input name="amount" type="number" required value="<%= initialBalance %>" class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none">
+      <input name="amount" type="number" required value="<%= initialBalance || 0 %>" class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none">
       <button class="bg-dark text-white px-6 py-2 rounded-lg font-bold">Enregistrer</button>
     </form>
   </div>
@@ -65,10 +65,10 @@
   </div>
 </div>
 
-<!-- HISTORIQUE DES DÉPENSES -->
+<!-- RELEVÉ DES MOUVEMENTS (HISTORIQUE DES DÉPENSES) -->
 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
   <div class="p-4 md:p-6 border-b flex justify-between items-center bg-slate-50">
-    <h2 class="text-lg font-bold text-slate-800">Historique des Retraits / Dépenses</h2>
+    <h2 class="text-lg font-bold text-slate-800">Relevé des Mouvements (Dépenses)</h2>
   </div>
   <div class="overflow-x-auto">
     <table class="w-full text-sm min-w-[600px]">
@@ -79,27 +79,27 @@
         <th class="px-4 py-3 text-right font-semibold text-slate-600">Montant</th>
       </tr></thead>
       <tbody class="divide-y divide-slate-100">
-        <% if (!expenses.length) { %>
-          <tr><td colspan="4" class="px-4 py-8 text-center text-slate-400 italic">Aucun retrait effectué</td></tr>
+        <% if (!expenses || !expenses.length) { %>
+          <tr><td colspan="4" class="px-4 py-8 text-center text-slate-400 italic">Aucun retrait effectué pour le moment.</td></tr>
         <% } %>
-        <% expenses.forEach(e => { %>
+        <% if (expenses) { expenses.forEach(e => { %>
           <tr>
             <td class="px-4 py-3"><%= new Date(e.created_at).toLocaleDateString('fr-FR') %></td>
             <td class="px-4 py-3 font-medium"><%= e.reason %></td>
             <td class="px-4 py-3 text-slate-500 font-mono text-xs"><%= e.npi %></td>
             <td class="px-4 py-3 text-right font-bold text-red-600">-<%= Number(e.amount).toLocaleString('fr-FR') %> FCFA</td>
           </tr>
-        <% }) %>
+        <% }) } %>
       </tbody>
     </table>
   </div>
 </div>
 
-<!-- LISTE DES MAUVAIS PAYEURS (Garde ton code existant ici) -->
+<!-- LISTE DES MAUVAIS PAYEURS -->
 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
   <div class="p-4 md:p-6 border-b flex justify-between items-center">
     <h2 class="text-lg md:text-xl font-bold text-slate-800">Membres en retard</h2>
-    <span class="px-2 py-1 bg-red-100 text-red-700 text-[10px] md:text-xs font-bold rounded-full"><%= debtors.length %> concerné(s)</span>
+    <span class="px-2 py-1 bg-red-100 text-red-700 text-[10px] md:text-xs font-bold rounded-full"><%= debtors ? debtors.length : 0 %> concerné(s)</span>
   </div>
   <div class="overflow-x-auto">
     <table class="w-full text-sm min-w-[500px]">
@@ -110,10 +110,10 @@
         <th class="px-4 py-3 text-right font-semibold text-slate-600">Action</th>
       </tr></thead>
       <tbody class="divide-y divide-slate-100">
-        <% if (!debtors.length) { %>
+        <% if (!debtors || !debtors.length) { %>
           <tr><td colspan="4" class="px-4 py-8 text-center text-green-600 font-bold">Tous les membres sont à jour ! 🎉</td></tr>
         <% } %>
-        <% debtors.forEach(d => { %>
+        <% if (debtors) { debtors.forEach(d => { %>
           <tr>
             <td class="px-4 py-3 font-medium"><%= d.name %></td>
             <td class="px-4 py-3">
@@ -133,7 +133,7 @@
               </form>
             </td>
           </tr>
-        <% }) %>
+        <% }) } %>
       </tbody>
     </table>
   </div>

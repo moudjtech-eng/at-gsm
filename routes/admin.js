@@ -28,27 +28,27 @@ router.get('/', async (req, res) => {
   res.render('admin/dashboard', { title: 'Admin', stats: { totalMembers: m[0].c, totalValidated: v[0].c, totalApplications: a[0].c, totalNews: n[0].c } });
 });
 
-// --- FINANCES (MISE A JOUR AVEC DÉPENSES ET SOLDE INITIAL) ---
+// --- PAGE FINANCES ---
 router.get('/finances', async (req, res) => {
   try {
-    // Revenus
+    // 1. Revenus (Cotisations validées + Adhésions payées)
     const { rows: r1 } = await db.execute(`SELECT COALESCE(SUM(amount), 0) as total FROM payment_requests WHERE status = 'validated'`);
     const { rows: r2 } = await db.execute(`SELECT COALESCE(SUM(adhesion_fee), 0) as total FROM applications WHERE transaction_ref IS NOT NULL`);
     const totalRevenue = Number(r1[0].total) + Number(r2[0].total);
     
-    // Dépenses
+    // 2. Dépenses
     const { rows: d1 } = await db.execute(`SELECT COALESCE(SUM(amount), 0) as total FROM expenses`);
     const totalExpenses = Number(d1[0].total);
     const { rows: expenses } = await db.execute(`SELECT * FROM expenses ORDER BY created_at DESC`);
 
-    // Solde Initial
+    // 3. Solde Initial
     const { rows: s1 } = await db.execute("SELECT value FROM settings WHERE key = 'initial_balance'");
-    const initialBalance = Number(s1[0].value);
+    const initialBalance = s1.length > 0 ? Number(s1[0].value) : 0;
 
-    // Calcul du Solde Actuel
+    // 4. Solde Actuel
     const currentBalance = initialBalance + totalRevenue - totalExpenses;
 
-    // Dettes
+    // 5. Dettes
     const { rows: r5 } = await db.execute(`SELECT COALESCE(SUM(debt_months * 500), 0) as total FROM members WHERE debt_months > 0`);
     const { rows: debtors } = await db.execute(`SELECT m.id, m.name, m.phone, m.debt_months, u.email FROM members m JOIN users u ON m.user_id = u.id WHERE m.debt_months > 0 ORDER BY m.debt_months DESC`);
 
@@ -62,7 +62,10 @@ router.get('/finances', async (req, res) => {
       totalDebt: Number(r5[0].total), 
       debtors 
     });
-  } catch (err) { console.error(err); res.redirect('/admin'); }
+  } catch (err) {
+    console.error("Erreur finances:", err);
+    res.redirect('/admin');
+  }
 });
 
 // --- DÉFINIR LE SOLDE INITIAL ---
