@@ -2,17 +2,33 @@
 
 <div class="max-w-4xl mx-auto pb-10">
   
-  <!-- BOUTONS D'ACTION (Non imprimables) -->
-  <div class="flex justify-between items-center mb-6 print:hidden">
+  <!-- BOUTONS D'ACTION ET FILTRE (Non imprimables) -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 print:hidden">
     <a href="/admin/finances" class="text-slate-500 hover:text-dark font-bold flex items-center gap-2">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
       Retour aux finances
     </a>
-    <button onclick="window.print()" class="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-red-700 flex items-center gap-2">
+    <button onclick="window.print()" class="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-red-700 flex items-center gap-2 shadow-md">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-      Imprimer / Enregistrer en PDF
+      Imprimer / PDF
     </button>
   </div>
+
+  <!-- FORMULAIRE DE FILTRE -->
+  <form action="/admin/finances/statement" method="GET" class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 flex flex-wrap gap-4 items-end print:hidden shadow-sm">
+    <div class="flex-1 min-w-[150px]">
+      <label class="block text-xs font-bold text-slate-600 mb-1">Date de début</label>
+      <input type="date" name="startDate" value="<%= startDate %>" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary outline-none">
+    </div>
+    <div class="flex-1 min-w-[150px]">
+      <label class="block text-xs font-bold text-slate-600 mb-1">Date de fin</label>
+      <input type="date" name="endDate" value="<%= endDate %>" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary outline-none">
+    </div>
+    <button type="submit" class="bg-dark text-white px-6 py-2.5 rounded-lg font-bold hover:bg-slate-800 transition-colors w-full md:w-auto">
+      Filtrer
+    </button>
+    <a href="/admin/finances/statement" class="text-sm font-bold text-slate-500 hover:text-primary w-full md:w-auto text-center pb-3 md:pb-0">Voir tout</a>
+  </form>
 
   <!-- LA FEUILLE DE RELEVÉ -->
   <div class="bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-slate-200 print:shadow-none print:border-none print:p-0">
@@ -25,27 +41,28 @@
       </div>
       <div class="text-right">
         <h2 class="text-xl font-bold text-slate-800 uppercase tracking-widest">Relevé de Compte</h2>
-        <p class="text-slate-500 text-sm mt-1">Généré le : <strong><%= date %></strong></p>
+        <p class="text-slate-500 text-sm mt-1">Période : <strong class="text-slate-800"><%= new Date(startDate).toLocaleDateString('fr-FR') %> au <%= new Date(endDate).toLocaleDateString('fr-FR') %></strong></p>
+        <p class="text-slate-400 text-xs mt-1">Généré le : <%= date %></p>
       </div>
     </div>
 
-    <!-- Résumé Comptable -->
+    <!-- Résumé Comptable de la période -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
       <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 print:bg-transparent">
-        <p class="text-[10px] uppercase font-bold text-slate-500">Solde Initial</p>
+        <p class="text-[10px] uppercase font-bold text-slate-500">Fond de caisse</p>
         <p class="text-lg font-bold text-slate-800"><%= initialBalance.toLocaleString('fr-FR') %> F</p>
       </div>
       <div class="bg-green-50 p-4 rounded-xl border border-green-200 print:bg-transparent">
-        <p class="text-[10px] uppercase font-bold text-green-600">Total Entrées (+)</p>
+        <p class="text-[10px] uppercase font-bold text-green-600">Entrées (Période)</p>
         <p class="text-lg font-bold text-green-700">+<%= totalIn.toLocaleString('fr-FR') %> F</p>
       </div>
       <div class="bg-red-50 p-4 rounded-xl border border-red-200 print:bg-transparent">
-        <p class="text-[10px] uppercase font-bold text-red-600">Total Sorties (-)</p>
+        <p class="text-[10px] uppercase font-bold text-red-600">Sorties (Période)</p>
         <p class="text-lg font-bold text-red-700">-<%= totalOut.toLocaleString('fr-FR') %> F</p>
       </div>
       <div class="bg-slate-800 p-4 rounded-xl border border-slate-900 text-white print:bg-slate-100 print:text-black">
-        <p class="text-[10px] uppercase font-bold opacity-80">Solde Actuel</p>
-        <p class="text-lg font-black"><%= currentBalance.toLocaleString('fr-FR') %> F</p>
+        <p class="text-[10px] uppercase font-bold opacity-80">Solde de la période</p>
+        <p class="text-lg font-black"><%= (initialBalance + totalIn - totalOut).toLocaleString('fr-FR') %> F</p>
       </div>
     </div>
 
@@ -62,7 +79,7 @@
       </thead>
       <tbody class="divide-y divide-slate-100 print:divide-slate-300">
         <% if (!transactions.length) { %>
-          <tr><td colspan="5" class="py-8 text-center text-slate-500 italic">Aucune transaction enregistrée.</td></tr>
+          <tr><td colspan="5" class="py-8 text-center text-slate-500 italic">Aucune transaction pour cette période.</td></tr>
         <% } %>
         <% transactions.forEach(t => { %>
           <tr>
@@ -74,12 +91,10 @@
             </td>
             <td class="py-3 px-2 font-medium text-slate-800"><%= t.name %></td>
             
-            <!-- Colonne Entrée -->
             <td class="py-3 px-2 text-right font-bold text-green-600">
               <%= t.type !== 'Retrait' ? Number(t.amount).toLocaleString('fr-FR') + ' F' : '' %>
             </td>
             
-            <!-- Colonne Sortie -->
             <td class="py-3 px-2 text-right font-bold text-red-600">
               <%= t.type === 'Retrait' ? Number(t.amount).toLocaleString('fr-FR') + ' F' : '' %>
             </td>

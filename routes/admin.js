@@ -281,35 +281,57 @@ router.get('/receipt/:ref', async (req, res) => {
   res.render('member/receipt', { payment: rows[0], member: { name: rows[0].name, spec: rows[0].spec, phone: rows[0].phone }, MONTHLY_FEE: 500 });
 });
 
-// --- GÉNÉRER LE RELEVÉ BANCAIRE ---
+// --- GÉNÉRER LE RELEVÉ BANCAIRE (AVEC FILTRE DE DATE) ---
 router.get('/finances/statement', async (req, res) => {
   try {
-    // On récupère toutes les entrées d'argent (Cotisations payées + Adhésions payées)
-    const { rows: cotisations } = await db.execute(`
-      SELECT 'Cotisation' as type, m.name, p.amount, p.created_at, p.status 
-      FROM payment_requests p JOIN members m ON p.member_id = m.id 
-      WHERE p.status = 'validated'
-    `);
-    const { rows: adhesions } = await db.execute(`
-      SELECT 'Adhésion' as type, name, adhesion_fee as amount, created_at, 'validated' as status 
-      FROM applications WHERE transaction_ref IS NOT NULL
-    `);
-    // On récupère les sorties d'argent (Dépenses)
-    const { rows: expenses } = await db.execute(`
-      SELECT 'Retrait' as type, reason as name, amount, created_at, 'validated' as status 
-      FROM expenses
-    `);
+    // Gestion des dates (Par défaut : du 1er du mois à aujourd'hui)
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
 
-    // On fusionne tout et on trie par date
+    // Récupération des dates depuis l'URL (ou valeurs par défaut)
+    const startDate = req.query.startDate || firstDay.toISOString().split('T')[0];
+    const endDate = req.query.endDate || today.toISOString().split('T')[0];
+
+    // On ajoute les heures pour inclure toute la journée de fin
+    const startDateTime = startDate + ' 00:00:00';
+    const endDateTime = endDate + ' 23:59:59';
+
+    // 1. Entrées : Cotisations
+    const { rows: cotisations } = await db.execute({
+      sql: `SELECT 'Cotisation' as type, m.name, p.amount, p.created_at, p.status 
+            FROM payment_requests p JOIN members m ON p.member_id = m.id 
+            WHERE p.status = 'validated' AND p.created_at >= ? AND p.created_at <= ?`,
+      args: [startDateTime, endDateTime]
+    });
+
+    // 2. Entrées : Adhésions
+    const { rows: adhesions } = await db.execute({
+      sql: `SELECT 'Adhésion' as type, name, adhesion_fee as amount, created_at, 'validated' as status 
+            FROM applications 
+            WHERE transaction_ref IS NOT NULL AND created_at >= ? AND created_at <= ?`,
+      args: [startDateTime, endDateTime]
+    });
+
+    // 3. Sorties : Dépenses
+    const { rows: expenses } = await db.execute({
+      sql: `SELECT 'Retrait' as type, reason as name, amount, created_at, 'validated' as status 
+            FROM expenses 
+            WHERE created_at >= ? AND created_at <= ?`,
+      args: [startDateTime, endDateTime]
+    });
+
+    // Fusion et tri
     let allTransactions = [...cotisations, ...adhesions, ...expenses];
     allTransactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-    // Calcul des totaux
+    // Calculs des totaux pour la période sélectionnée
     const totalIn = allTransactions.filter(t => t.type !== 'Retrait').reduce((sum, t) => sum + Number(t.amount), 0);
     const totalOut = allTransactions.filter(t => t.type === 'Retrait').reduce((sum, t) => sum + Number(t.amount), 0);
     
     const { rows: s1 } = await db.execute("SELECT value FROM settings WHERE key = 'initial_balance'");
     const initialBalance = s1.length > 0 ? Number(s1[0].value) : 0;
+    
+    // Note : Le solde actuel ici est basé sur la période choisie
     const currentBalance = initialBalance + totalIn - totalOut;
 
     res.render('admin/statement', { 
@@ -319,6 +341,8 @@ router.get('/finances/statement', async (req, res) => {
       totalOut,
       initialBalance,
       currentBalance,
+      startDate,
+      endDate,
       date: new Date().toLocaleDateString('fr-FR')
     });
   } catch (err) {
