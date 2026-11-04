@@ -1,3 +1,4 @@
+const { sendAdhesionReceiptEmail } = require('../utils/mailer');
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
@@ -125,6 +126,20 @@ router.post('/apply', upload.single('docs'), async (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [name, email, phone, spec, req.file ? req.file.filename : null, member_type, trainer_phone || null, isBohicon, adhesionFee, paymentRef]
     });
+
+        // ... (après l'insertion dans la base de données) ...
+
+    // Si c'est un nouveau membre qui a payé, on lui envoie son reçu
+    if (member_type === 'new' && paymentRef) {
+      sendAdhesionReceiptEmail(
+        { name: name, email: email, phone: phone }, 
+        adhesionFee, 
+        paymentRef
+      );
+    }
+
+    req.flash('success', 'Candidature envoyée avec succès ! Un reçu vous a été envoyé par email.');
+    res.redirect('/');
 
     req.flash('success', 'Candidature envoyée avec succès ! Nous vous contacterons bientôt.');
     res.redirect('/');

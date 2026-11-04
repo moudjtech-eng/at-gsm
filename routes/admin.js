@@ -36,16 +36,49 @@ router.get('/', async (req, res) => {
   } catch (err) { console.error(err); res.redirect('/'); }
 });
 
-// --- FINANCES ---
+// --- PAGE FINANCES ---
 router.get('/finances', async (req, res) => {
   try {
-    const { rows: r1 } = await db.execute(`SELECT COALESCE(SUM(amount), 0) as total FROM payment_requests WHERE status = 'validated' AND strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')`);
-    const { rows: r2 } = await db.execute(`SELECT COALESCE(SUM(amount), 0) as total FROM payment_requests WHERE status = 'validated'`);
-    const { rows: r3 } = await db.execute(`SELECT COALESCE(SUM(debt_months * 500), 0) as total FROM members WHERE debt_months > 0`);
-    const { rows: debtors } = await db.execute(`SELECT m.id, m.name, m.phone, m.debt_months, u.email FROM members m JOIN users u ON m.user_id = u.id WHERE m.debt_months > 0 ORDER BY m.debt_months DESC`);
+    // 1. Revenus des COTISATIONS du mois en cours
+    const { rows: r1 } = await db.execute(`
+      SELECT COALESCE(SUM(amount), 0) as total FROM payment_requests 
+      WHERE status = 'validated' AND strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')
+    `);
+    
+    // 2. Revenus des ADHÉSIONS du mois en cours
+    const { rows: r2 } = await db.execute(`
+      SELECT COALESCE(SUM(adhesion_fee), 0) as total FROM applications 
+      WHERE transaction_ref IS NOT NULL AND strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')
+    `);
 
-    res.render('admin/finances', { title: 'Finances', revenueThisMonth: Number(r1[0].total), totalRevenue: Number(r2[0].total), totalDebt: Number(r3[0].total), debtors });
-  } catch (err) { console.error(err); res.redirect('/admin'); }
+    // 3. Revenus TOTAUX depuis le début (Cotisations + Adhésions)
+    const { rows: r3 } = await db.execute(`SELECT COALESCE(SUM(amount), 0) as total FROM payment_requests WHERE status = 'validated'`);
+    const { rows: r4 } = await db.execute(`SELECT COALESCE(SUM(adhesion_fee), 0) as total FROM applications WHERE transaction_ref IS NOT NULL`);
+    
+    const totalRevenue = Number(r3[0].total) + Number(r4[0].total);
+
+    // 4. Dette totale
+    const { rows: r5 } = await db.execute(`SELECT COALESCE(SUM(debt_months * 500), 0) as total FROM members WHERE debt_months > 0`);
+    
+    // 5. Liste des mauvais payeurs
+    const { rows: debtors } = await db.execute(`
+      SELECT m.id, m.name, m.phone, m.debt_months, u.email 
+      FROM members m JOIN users u ON m.user_id = u.id 
+      WHERE m.debt_months > 0 ORDER BY m.debt_months DESC
+    `);
+
+    res.render('admin/finances', { 
+      title: 'Finances', 
+      cotisationsThisMonth: Number(r1[0].total), 
+      adhesionsThisMonth: Number(r2[0].total), 
+      totalRevenue: totalRevenue, 
+      totalDebt: Number(r5[0].total), 
+      debtors 
+    });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin');
+  }
 });
 
 // --- RELANCE EMAIL ---

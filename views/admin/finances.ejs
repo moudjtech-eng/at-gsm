@@ -1,22 +1,31 @@
 <%- include('../partials/header') %>
 <h1 class="text-2xl md:text-3xl font-bold mb-6">Tableau de Bord Financier</h1>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
-  <div class="bg-white p-4 md:p-6 rounded-2xl border shadow-sm">
-    <p class="text-slate-500 text-xs uppercase font-bold mb-1">Revenus du Mois</p>
-    <p class="text-2xl md:text-3xl font-extrabold text-green-600"><%= revenueThisMonth.toLocaleString('fr-FR') %> FCFA</p>
+<!-- CARTES DE STATISTIQUES -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+  <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-slate-500 text-[10px] md:text-xs uppercase font-bold mb-1">Cotisations (Ce mois)</p>
+    <p class="text-xl md:text-2xl font-extrabold text-green-600"><%= cotisationsThisMonth.toLocaleString('fr-FR') %> FCFA</p>
   </div>
-  <div class="bg-white p-4 md:p-6 rounded-2xl border shadow-sm">
-    <p class="text-slate-500 text-xs uppercase font-bold mb-1">Total Encaissé</p>
-    <p class="text-2xl md:text-3xl font-extrabold text-blue-600"><%= totalRevenue.toLocaleString('fr-FR') %> FCFA</p>
+  
+  <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-slate-500 text-[10px] md:text-xs uppercase font-bold mb-1">Adhésions (Ce mois)</p>
+    <p class="text-xl md:text-2xl font-extrabold text-blue-600"><%= adhesionsThisMonth.toLocaleString('fr-FR') %> FCFA</p>
   </div>
-  <div class="bg-white p-4 md:p-6 rounded-2xl border shadow-sm">
-    <p class="text-slate-500 text-xs uppercase font-bold mb-1">Dettes (À recouvrer)</p>
-    <p class="text-2xl md:text-3xl font-extrabold text-red-600"><%= totalDebt.toLocaleString('fr-FR') %> FCFA</p>
+  
+  <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-slate-500 text-[10px] md:text-xs uppercase font-bold mb-1">Total Global Encaissé</p>
+    <p class="text-xl md:text-2xl font-extrabold text-purple-600"><%= totalRevenue.toLocaleString('fr-FR') %> FCFA</p>
+  </div>
+  
+  <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-slate-500 text-[10px] md:text-xs uppercase font-bold mb-1">Dettes (À recouvrer)</p>
+    <p class="text-xl md:text-2xl font-extrabold text-red-600"><%= totalDebt.toLocaleString('fr-FR') %> FCFA</p>
   </div>
 </div>
 
-<div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+<!-- LISTE DES MAUVAIS PAYEURS -->
+<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
   <div class="p-4 md:p-6 border-b flex justify-between items-center">
     <h2 class="text-lg md:text-xl font-bold text-slate-800">Membres en retard</h2>
     <span class="px-2 py-1 bg-red-100 text-red-700 text-[10px] md:text-xs font-bold rounded-full"><%= debtors.length %> concerné(s)</span>
@@ -43,7 +52,7 @@
             </td>
             <td class="px-4 py-3">
               <span class="px-2 py-1 bg-red-100 text-red-700 text-[10px] font-bold rounded-full uppercase">
-                <%= d.debt_months %> mois
+                <%= d.debt_months %> mois (<%= (d.debt_months * 500).toLocaleString('fr-FR') %> FCFA)
               </span>
             </td>
             <td class="px-4 py-3 text-right">

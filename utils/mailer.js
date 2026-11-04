@@ -144,4 +144,69 @@ async function sendReminderEmail(memberEmail, memberName, debtMonths, amount) {
   }
 }
 
-module.exports = { sendReceiptEmail, sendAdminNotificationEmail, sendReminderEmail };
+// --- 4. REÇU D'ADHÉSION POUR LES NOUVEAUX MEMBRES ---
+async function sendAdhesionReceiptEmail(applicant, fee, transactionId) {
+  return new Promise((resolve) => {
+    const doc = new PDFDocument({ margin: 50 });
+    const buffers = [];
+    
+    doc.on('data', buffers.push.bind(buffers));
+    doc.on('end', async () => {
+      const pdfData = Buffer.concat(buffers);
+
+      try {
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: applicant.email,
+          subject: `Reçu d'adhésion AT-GSM - #${transactionId}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; color: #333;">
+              <h2 style="color: #dc2626;">Bienvenue à l'AT-GSM !</h2>
+              <p>Bonjour <strong>${applicant.name}</strong>,</p>
+              <p>Nous avons bien reçu vos frais d'adhésion de <strong>${fee.toLocaleString('fr-FR')} FCFA</strong>.</p>
+              <p>Votre candidature est actuellement en cours d'examen par notre administration.</p>
+              <p>Vous trouverez votre reçu officiel en pièce jointe.</p>
+              <br>
+              <p>L'équipe AT-GSM Bohicon.</p>
+            </div>
+          `,
+          attachments: [{ filename: `recu-adhesion-${transactionId}.pdf`, content: pdfData }]
+        });
+        console.log(`📧 Reçu d'adhésion envoyé à ${applicant.email}`);
+        resolve(true);
+      } catch (error) {
+        console.error("Erreur d'envoi:", error);
+        resolve(false);
+      }
+    });
+
+    // --- DESSIN DU PDF ---
+    doc.fontSize(20).font('Helvetica-Bold').text('AT-GSM BOHICON', { align: 'center' });
+    doc.fontSize(10).font('Helvetica').text('Association des Techniciens GSM', { align: 'center' });
+    doc.moveDown();
+    doc.moveTo(50, 100).lineTo(550, 100).stroke();
+    
+    doc.fontSize(12).font('Helvetica-Bold').text('REÇU D\'ADHÉSION', 50, 120);
+    doc.fontSize(10).font('Helvetica');
+    doc.text(`Référence : #${transactionId}`, 50, 140);
+    doc.text(`Date : ${new Date().toLocaleDateString('fr-FR')}`, 50, 155);
+    
+    doc.fontSize(12).font('Helvetica-Bold').text('Candidat :', 350, 120);
+    doc.fontSize(10).font('Helvetica').text(applicant.name, 350, 140);
+    doc.text(applicant.phone, 350, 155);
+    
+    const tableTop = 220;
+    doc.font('Helvetica-Bold').text('Désignation', 50, tableTop).text('Montant', 450, tableTop, { align: 'right' });
+    doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+    
+    doc.font('Helvetica').text('Frais d\'adhésion AT-GSM', 50, tableTop + 30).text(`${fee.toLocaleString('fr-FR')} FCFA`, 450, tableTop + 30, { align: 'right' });
+    doc.moveTo(50, tableTop + 50).lineTo(550, tableTop + 50).stroke();
+    
+    doc.font('Helvetica-Bold').text('TOTAL PAYÉ :', 350, tableTop + 70).text(`${fee.toLocaleString('fr-FR')} FCFA`, 450, tableTop + 70, { align: 'right' });
+    doc.fontSize(10).fillColor('green').text('PAYÉ VIA KKIAPAY', 50, tableTop + 110, { align: 'center' });
+    
+    doc.end();
+  });
+}
+
+module.exports = { sendReceiptEmail, sendAdminNotificationEmail, sendReminderEmail, sendAdhesionReceiptEmail };
