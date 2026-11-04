@@ -16,38 +16,43 @@ async function seedPendingContributions(memberId, debtMonths) {
 }
 
 async function init() {
+  // Tables existantes
   await db.execute(`CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'member', status TEXT NOT NULL DEFAULT 'actif', reset_token TEXT, reset_token_expires INTEGER, created_at TEXT NOT NULL DEFAULT (datetime('now')))`);
   await db.execute(`CREATE TABLE IF NOT EXISTS members (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL UNIQUE, name TEXT NOT NULL, phone TEXT, spec TEXT, skills TEXT, url TEXT, bio TEXT, location TEXT, latitude REAL, longitude REAL, photo_path TEXT, debt_months INTEGER NOT NULL DEFAULT 0, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)`);
   await db.execute(`CREATE TABLE IF NOT EXISTS contributions (id INTEGER PRIMARY KEY AUTOINCREMENT, member_id INTEGER NOT NULL, month TEXT NOT NULL, year INTEGER NOT NULL, amount INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'pending', paid_at TEXT, FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE)`);
   await db.execute(`CREATE TABLE IF NOT EXISTS payment_requests (id INTEGER PRIMARY KEY AUTOINCREMENT, member_id INTEGER NOT NULL, months INTEGER NOT NULL, amount INTEGER NOT NULL, ref TEXT UNIQUE NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created_at TEXT NOT NULL DEFAULT (datetime('now')), FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE)`);
-  
-  // Nouvelle table applications avec transaction_ref
-  await db.execute(`CREATE TABLE IF NOT EXISTS applications (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, 
-    name TEXT NOT NULL, 
-    email TEXT NOT NULL, 
-    phone TEXT NOT NULL, 
-    spec TEXT NOT NULL, 
-    docs_path TEXT, 
-    status TEXT NOT NULL DEFAULT 'pending', 
-    member_type TEXT DEFAULT 'existing', 
-    trainer_phone TEXT, 
-    trainer_is_bohicon INTEGER DEFAULT 0, 
-    adhesion_fee INTEGER DEFAULT 0,
-    transaction_ref TEXT,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
-  )`);
-  
+  await db.execute(`CREATE TABLE IF NOT EXISTS applications (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL, phone TEXT NOT NULL, spec TEXT NOT NULL, docs_path TEXT, status TEXT NOT NULL DEFAULT 'pending', member_type TEXT DEFAULT 'existing', trainer_phone TEXT, trainer_is_bohicon INTEGER DEFAULT 0, adhesion_fee INTEGER DEFAULT 0, transaction_ref TEXT, created_at TEXT NOT NULL DEFAULT (datetime('now')))`);
   await db.execute(`CREATE TABLE IF NOT EXISTS news (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, category TEXT NOT NULL, content TEXT NOT NULL, image_path TEXT, author TEXT DEFAULT 'Administrateur', created_at TEXT NOT NULL DEFAULT (datetime('now')))`);
 
-  // Migrations
+  // NOUVELLES TABLES : DÉPENSES ET RÉGLAGES
+  await db.execute(`CREATE TABLE IF NOT EXISTS expenses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    amount INTEGER NOT NULL,
+    reason TEXT NOT NULL,
+    npi TEXT NOT NULL,
+    cip_expiry TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`);
+
+  await db.execute(`CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  )`);
+
+  // Initialiser le solde de départ si non existant
+  const checkBalance = await db.execute("SELECT value FROM settings WHERE key = 'initial_balance'");
+  if (checkBalance.rows.length === 0) {
+    await db.execute("INSERT INTO settings (key, value) VALUES ('initial_balance', '0')");
+  }
+
+  // Migrations de sécurité...
   try {
     const appInfo = await db.execute("PRAGMA table_info(applications)");
     const appCols = appInfo.rows.map(c => c.name);
     if (!appCols.includes('transaction_ref')) await db.execute("ALTER TABLE applications ADD COLUMN transaction_ref TEXT");
   } catch (err) { console.error("Erreur migration:", err); }
 
-  console.log('✅ Base de données prête avec système d\'adhésion et KkiaPay');
+  console.log('✅ Base de données prête (Trésorerie et Adhésions)');
 }
 
 init().catch(console.error);

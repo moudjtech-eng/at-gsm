@@ -2,40 +2,110 @@
 <h1 class="text-2xl md:text-3xl font-bold mb-6">Tableau de Bord Financier</h1>
 
 <!-- CARTES DE STATISTIQUES -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-  <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
-    <p class="text-slate-500 text-[10px] md:text-xs uppercase font-bold mb-1">Cotisations (Ce mois)</p>
-    <p class="text-xl md:text-2xl font-extrabold text-green-600"><%= cotisationsThisMonth.toLocaleString('fr-FR') %> FCFA</p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-slate-500 text-xs uppercase font-bold mb-1">Solde Actuel de la Caisse</p>
+    <p class="text-3xl md:text-4xl font-black text-green-600"><%= currentBalance.toLocaleString('fr-FR') %> FCFA</p>
   </div>
   
-  <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
-    <p class="text-slate-500 text-[10px] md:text-xs uppercase font-bold mb-1">Adhésions (Ce mois)</p>
-    <p class="text-xl md:text-2xl font-extrabold text-blue-600"><%= adhesionsThisMonth.toLocaleString('fr-FR') %> FCFA</p>
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-slate-500 text-xs uppercase font-bold mb-1">Total des Revenus (Cotisations + Adhésions)</p>
+    <p class="text-2xl font-extrabold text-blue-600"><%= totalRevenue.toLocaleString('fr-FR') %> FCFA</p>
   </div>
   
-  <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
-    <p class="text-slate-500 text-[10px] md:text-xs uppercase font-bold mb-1">Total Global Encaissé</p>
-    <p class="text-xl md:text-2xl font-extrabold text-purple-600"><%= totalRevenue.toLocaleString('fr-FR') %> FCFA</p>
-  </div>
-  
-  <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
-    <p class="text-slate-500 text-[10px] md:text-xs uppercase font-bold mb-1">Dettes (À recouvrer)</p>
-    <p class="text-xl md:text-2xl font-extrabold text-red-600"><%= totalDebt.toLocaleString('fr-FR') %> FCFA</p>
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-slate-500 text-xs uppercase font-bold mb-1">Total des Dépenses / Retraits</p>
+    <p class="text-2xl font-extrabold text-red-600"><%= totalExpenses.toLocaleString('fr-FR') %> FCFA</p>
   </div>
 </div>
 
-<!-- LISTE DES MAUVAIS PAYEURS -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+  <!-- CONFIGURATION DU SOLDE INITIAL -->
+  <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
+    <h2 class="text-xl font-bold mb-4">⚙️ Configuration de la Caisse</h2>
+    <p class="text-sm text-slate-600 mb-4">Entrez la somme que l'association possédait en caisse <strong>avant</strong> la création du site. Cela permet d'équilibrer les comptes.</p>
+    <form action="/admin/finances/initial-balance" method="POST" class="flex gap-2">
+      <input name="amount" type="number" required value="<%= initialBalance %>" class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none">
+      <button class="bg-dark text-white px-6 py-2 rounded-lg font-bold">Enregistrer</button>
+    </form>
+  </div>
+
+  <!-- FORMULAIRE DE RETRAIT (TG UNIQUEMENT) -->
+  <div class="bg-white p-6 rounded-2xl border-2 border-red-100 shadow-sm">
+    <h2 class="text-xl font-bold text-red-600 mb-2">🚨 Effectuer un Retrait</h2>
+    <p class="text-xs text-slate-500 mb-4">Réservé au Trésorier Général (TG). Toute opération est tracée.</p>
+    
+    <form action="/admin/finances/withdraw" method="POST" class="space-y-3">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-bold text-slate-700">Montant (FCFA)</label>
+          <input name="amount" type="number" required placeholder="Ex: 5000" class="w-full px-4 py-2 border rounded-lg mt-1">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-700">Motif du retrait</label>
+          <input name="reason" type="text" required placeholder="Ex: Achat matériel" class="w-full px-4 py-2 border rounded-lg mt-1">
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-bold text-slate-700">Numéro NPI</label>
+          <input name="npi" type="text" required placeholder="Votre NPI" class="w-full px-4 py-2 border rounded-lg mt-1">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-700">Date d'expiration CIP</label>
+          <input name="cip_expiry" type="date" required class="w-full px-4 py-2 border rounded-lg mt-1">
+        </div>
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-700">Clé Privée (Code Secret TG)</label>
+        <input name="secret_key" type="password" required placeholder="Entrez votre clé privée" class="w-full px-4 py-2 border rounded-lg mt-1 bg-red-50 font-mono text-red-700">
+      </div>
+      <button type="submit" class="w-full bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700 transition-colors">Valider le Retrait</button>
+    </form>
+  </div>
+</div>
+
+<!-- HISTORIQUE DES DÉPENSES -->
+<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+  <div class="p-4 md:p-6 border-b flex justify-between items-center bg-slate-50">
+    <h2 class="text-lg font-bold text-slate-800">Historique des Retraits / Dépenses</h2>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm min-w-[600px]">
+      <thead class="bg-white"><tr>
+        <th class="px-4 py-3 text-left font-semibold text-slate-600">Date</th>
+        <th class="px-4 py-3 text-left font-semibold text-slate-600">Motif</th>
+        <th class="px-4 py-3 text-left font-semibold text-slate-600">NPI</th>
+        <th class="px-4 py-3 text-right font-semibold text-slate-600">Montant</th>
+      </tr></thead>
+      <tbody class="divide-y divide-slate-100">
+        <% if (!expenses.length) { %>
+          <tr><td colspan="4" class="px-4 py-8 text-center text-slate-400 italic">Aucun retrait effectué</td></tr>
+        <% } %>
+        <% expenses.forEach(e => { %>
+          <tr>
+            <td class="px-4 py-3"><%= new Date(e.created_at).toLocaleDateString('fr-FR') %></td>
+            <td class="px-4 py-3 font-medium"><%= e.reason %></td>
+            <td class="px-4 py-3 text-slate-500 font-mono text-xs"><%= e.npi %></td>
+            <td class="px-4 py-3 text-right font-bold text-red-600">-<%= Number(e.amount).toLocaleString('fr-FR') %> FCFA</td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- LISTE DES MAUVAIS PAYEURS (Garde ton code existant ici) -->
 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
   <div class="p-4 md:p-6 border-b flex justify-between items-center">
     <h2 class="text-lg md:text-xl font-bold text-slate-800">Membres en retard</h2>
     <span class="px-2 py-1 bg-red-100 text-red-700 text-[10px] md:text-xs font-bold rounded-full"><%= debtors.length %> concerné(s)</span>
   </div>
-  
   <div class="overflow-x-auto">
     <table class="w-full text-sm min-w-[500px]">
       <thead class="bg-slate-50"><tr>
         <th class="px-4 py-3 text-left font-semibold text-slate-600">Membre</th>
-        <th class="px-4 py-3 text-left font-semibold text-slate-600 hidden md:table-cell">Contact</th>
+        <th class="px-4 py-3 text-left font-semibold text-slate-600">Contact</th>
         <th class="px-4 py-3 text-left font-semibold text-slate-600">Retard</th>
         <th class="px-4 py-3 text-right font-semibold text-slate-600">Action</th>
       </tr></thead>
@@ -46,7 +116,7 @@
         <% debtors.forEach(d => { %>
           <tr>
             <td class="px-4 py-3 font-medium"><%= d.name %></td>
-            <td class="px-4 py-3 hidden md:table-cell">
+            <td class="px-4 py-3">
               <p class="text-slate-700"><%= d.phone %></p>
               <p class="text-xs text-slate-500"><%= d.email %></p>
             </td>
