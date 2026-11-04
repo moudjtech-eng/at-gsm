@@ -1,21 +1,111 @@
 <%- include('partials/header') %>
-<div class="max-w-3xl mx-auto">
-  <h1 class="text-3xl font-bold mb-2">Formulaire de Candidature</h1>
-  <p class="text-slate-600 mb-8">Rejoignez le réseau d'élite.</p>
-  <form action="/apply" method="POST" enctype="multipart/form-data" class="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div><label class="text-sm font-bold">Nom Complet</label><input name="name" required class="w-full px-4 py-3 border rounded-xl mt-1"></div>
-      <div><label class="text-sm font-bold">Email</label><input name="email" type="email" required class="w-full px-4 py-3 border rounded-xl mt-1"></div>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div><label class="text-sm font-bold">Téléphone</label><input name="phone" type="tel" required class="w-full px-4 py-3 border rounded-xl mt-1"></div>
-      <div><label class="text-sm font-bold">Spécialité</label><input name="spec" required class="w-full px-4 py-3 border rounded-xl mt-1"></div>
-    </div>
-    <div>
-      <label class="text-sm font-bold">Diplômes & Certificats (PDF UNIQUEMENT)</label>
-      <input type="file" name="docs" accept="application/pdf" required class="w-full px-4 py-3 border rounded-xl mt-1 bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
-    </div>
-    <button type="submit" class="w-full py-4 bg-primary text-white rounded-xl font-bold hover:bg-red-700">Envoyer ma Candidature</button>
-  </form>
+
+<div class="max-w-3xl mx-auto mt-8">
+  <div class="text-center mb-8">
+    <h2 class="text-3xl font-bold text-dark mb-2">Formulaire de Candidature</h2>
+    <p class="text-slate-600">Rejoignez le réseau d'élite des techniciens GSM de Bohicon.</p>
+  </div>
+
+  <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-xl">
+    <form action="/apply" method="POST" enctype="multipart/form-data" class="space-y-6">
+      
+      <!-- TYPE DE MEMBRE -->
+      <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+        <label class="text-sm font-bold text-slate-700 block mb-2">Quel est votre profil ?</label>
+        <select name="member_type" id="member_type" onchange="toggleNewMemberFields()" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary outline-none font-medium">
+          <option value="existing">Je suis un ancien membre (avant le site)</option>
+          <option value="new">Je suis un nouveau membre (Première adhésion)</option>
+        </select>
+      </div>
+
+      <!-- INFOS DE BASE -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="text-sm font-bold text-slate-700">Nom Complet</label>
+          <input name="name" type="text" required placeholder="Ex: Jean Dupont" class="w-full px-4 py-3 border border-slate-300 rounded-xl mt-1 focus:ring-2 focus:ring-primary outline-none">
+        </div>
+        <div>
+          <label class="text-sm font-bold text-slate-700">Email</label>
+          <input name="email" type="email" required placeholder="exemple@email.com" class="w-full px-4 py-3 border border-slate-300 rounded-xl mt-1 focus:ring-2 focus:ring-primary outline-none">
+        </div>
+        <div>
+          <label class="text-sm font-bold text-slate-700">Téléphone</label>
+          <input name="phone" type="tel" required placeholder="+229 00 00 00 00" class="w-full px-4 py-3 border border-slate-300 rounded-xl mt-1 focus:ring-2 focus:ring-primary outline-none">
+        </div>
+        <div>
+          <label class="text-sm font-bold text-slate-700">Spécialité</label>
+          <input name="spec" type="text" required placeholder="Ex: Micro-soudure" class="w-full px-4 py-3 border border-slate-300 rounded-xl mt-1 focus:ring-2 focus:ring-primary outline-none">
+        </div>
+      </div>
+
+      <!-- CHAMPS CACHÉS POUR NOUVEAU MEMBRE -->
+      <div id="new-member-fields" class="hidden space-y-4 bg-red-50 p-4 md:p-6 rounded-2xl border border-red-100">
+        <h3 class="text-lg font-bold text-primary mb-2">Frais d'adhésion</h3>
+        <p class="text-sm text-slate-600 mb-4">En tant que nouveau membre, vous devez payer des frais d'adhésion qui servent à votre enregistrement officiel.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-bold text-slate-700">Nom & Numéro de votre Formateur (Patron)</label>
+            <input name="trainer_phone" id="trainer_phone" type="text" placeholder="Ex: M. Koffi - 97000000" class="w-full px-4 py-3 border border-slate-300 rounded-xl mt-1 focus:ring-2 focus:ring-primary outline-none">
+          </div>
+          <div>
+            <label class="text-sm font-bold text-slate-700">Votre formateur est-il de Bohicon ?</label>
+            <select name="trainer_is_bohicon" id="trainer_is_bohicon" onchange="updateAdhesionFee()" class="w-full px-4 py-3 border border-slate-300 rounded-xl mt-1 focus:ring-2 focus:ring-primary outline-none bg-white">
+              <option value="1">Oui (Frais : 5 000 FCFA)</option>
+              <option value="0">Non, d'une autre ville (Frais : 10 000 FCFA)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-4 p-4 bg-white rounded-xl border border-red-100 flex justify-between items-center">
+          <span class="font-bold text-slate-700">Total à payer pour l'adhésion :</span>
+          <span class="text-2xl font-black text-primary"><span id="fee_display">5 000</span> FCFA</span>
+        </div>
+        <p class="text-xs text-slate-500 mt-2">💡 Le paiement de ces frais sera validé par l'administration lors de votre entretien.</p>
+      </div>
+
+      <!-- DIPLOMES -->
+      <div>
+        <label class="text-sm font-bold text-slate-700">Diplômes & Certificats (PDF uniquement)</label>
+        <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-primary transition-colors cursor-pointer relative mt-1 bg-slate-50">
+          <input type="file" name="docs" accept="application/pdf" required class="absolute inset-0 opacity-0 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.8-7.7A4 4 0 1112 10.5" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16v4m0 0l-2-2m2 2l2-2" /></svg>
+          <p class="text-sm text-slate-500">Cliquez pour télécharger votre CV ou vos diplômes</p>
+        </div>
+      </div>
+
+      <button type="submit" class="w-full py-4 bg-primary text-white rounded-xl font-bold hover:bg-red-700 transition-all transform active:scale-95 shadow-lg text-lg">
+        Envoyer ma Candidature
+      </button>
+    </form>
+  </div>
 </div>
+
+<script>
+  function toggleNewMemberFields() {
+    const type = document.getElementById('member_type').value;
+    const newFields = document.getElementById('new-member-fields');
+    const trainerInput = document.getElementById('trainer_phone');
+    
+    if (type === 'new') {
+      newFields.classList.remove('hidden');
+      trainerInput.setAttribute('required', 'required');
+    } else {
+      newFields.classList.add('hidden');
+      trainerInput.removeAttribute('required');
+    }
+  }
+
+  function updateAdhesionFee() {
+    const isBohicon = document.getElementById('trainer_is_bohicon').value;
+    const feeDisplay = document.getElementById('fee_display');
+    
+    if (isBohicon === '1') {
+      feeDisplay.innerText = "5 000";
+    } else {
+      feeDisplay.innerText = "10 000";
+    }
+  }
+</script>
+
 <%- include('partials/footer') %>

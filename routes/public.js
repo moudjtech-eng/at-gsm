@@ -64,11 +64,13 @@ router.get('/apply', (req, res) => {
 });
 
 router.post('/apply', upload.single('docs'), async (req, res) => {
-  const { name, email, phone, spec } = req.body;
+  const { name, email, phone, spec, member_type, trainer_phone, trainer_is_bohicon } = req.body;
+  
   if (!name || !email || !phone || !spec) {
-    req.flash('error', 'Tous les champs sont requis.');
+    req.flash('error', 'Tous les champs obligatoires sont requis.');
     return res.redirect('/apply');
   }
+
   try {
     const { rows } = await db.execute({
       sql: "SELECT id FROM applications WHERE email = ? AND status = 'pending'",
@@ -78,10 +80,22 @@ router.post('/apply', upload.single('docs'), async (req, res) => {
       req.flash('error', 'Une candidature est déjà en cours avec cet email.');
       return res.redirect('/apply');
     }
+
+    // Calcul des frais d'adhésion si c'est un nouveau membre
+    let adhesionFee = 0;
+    let isBohicon = 0;
+    if (member_type === 'new') {
+      isBohicon = trainer_is_bohicon === '1' ? 1 : 0;
+      adhesionFee = isBohicon ? 5000 : 10000;
+    }
+
     await db.execute({
-      sql: "INSERT INTO applications (name, email, phone, spec, docs_path) VALUES (?, ?, ?, ?, ?)",
-      args: [name, email, phone, spec, req.file ? req.file.filename : null]
+      sql: `INSERT INTO applications 
+            (name, email, phone, spec, docs_path, member_type, trainer_phone, trainer_is_bohicon, adhesion_fee) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [name, email, phone, spec, req.file ? req.file.filename : null, member_type, trainer_phone || null, isBohicon, adhesionFee]
     });
+
     req.flash('success', 'Candidature envoyée ! Nous vous contacterons bientôt.');
     res.redirect('/');
   } catch (err) {
