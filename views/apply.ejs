@@ -7,15 +7,22 @@
   </div>
 
   <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-xl">
-    <form action="/apply" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <form id="apply-form" action="/apply" method="POST" enctype="multipart/form-data" class="space-y-6">
       
       <!-- TYPE DE MEMBRE -->
       <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
         <label class="text-sm font-bold text-slate-700 block mb-2">Quel est votre profil ?</label>
-        <select name="member_type" id="member_type" onchange="toggleNewMemberFields()" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary outline-none font-medium">
+        <select name="member_type" id="member_type" onchange="toggleNewMemberFields()" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary outline-none font-medium bg-white">
           <option value="existing">Je suis un ancien membre (avant le site)</option>
           <option value="new">Je suis un nouveau membre (Première adhésion)</option>
         </select>
+        
+        <!-- LE MESSAGE D'AVERTISSEMENT EN ROUGE -->
+        <div id="existing-warning" class="mt-3 p-3 bg-red-50 border-l-4 border-red-600 rounded-r-lg">
+          <p class="text-sm font-bold text-red-700 leading-tight">
+            ⚠️ Important : L'AT-GSM se réserve le droit de rejeter votre demande si le comité constate que vous avez des arriérés de paiement sur vos cotisations mensuelles passées.
+          </p>
+        </div>
       </div>
 
       <!-- INFOS DE BASE -->
@@ -38,10 +45,10 @@
         </div>
       </div>
 
-      <!-- CHAMPS CACHÉS POUR NOUVEAU MEMBRE -->
-      <div id="new-member-fields" class="hidden space-y-4 bg-red-50 p-4 md:p-6 rounded-2xl border border-red-100">
-        <h3 class="text-lg font-bold text-primary mb-2">Frais d'adhésion</h3>
-        <p class="text-sm text-slate-600 mb-4">En tant que nouveau membre, vous devez payer des frais d'adhésion qui servent à votre enregistrement officiel.</p>
+      <!-- CHAMPS NOUVEAU MEMBRE -->
+      <div id="new-member-fields" class="hidden space-y-4 bg-blue-50 p-4 md:p-6 rounded-2xl border border-blue-100">
+        <h3 class="text-lg font-bold text-blue-800 mb-2">Frais d'adhésion</h3>
+        <p class="text-sm text-blue-700 mb-4">En tant que nouveau membre, vous devez régler vos frais d'enregistrement. Le paiement se fera par Mobile Money (KkiaPay) lors de l'envoi du formulaire.</p>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -57,11 +64,10 @@
           </div>
         </div>
 
-        <div class="mt-4 p-4 bg-white rounded-xl border border-red-100 flex justify-between items-center">
-          <span class="font-bold text-slate-700">Total à payer pour l'adhésion :</span>
+        <div class="mt-4 p-4 bg-white rounded-xl border border-blue-100 flex justify-between items-center">
+          <span class="font-bold text-slate-700">Total à payer en ligne :</span>
           <span class="text-2xl font-black text-primary"><span id="fee_display">5 000</span> FCFA</span>
         </div>
-        <p class="text-xs text-slate-500 mt-2">💡 Le paiement de ces frais sera validé par l'administration lors de votre entretien.</p>
       </div>
 
       <!-- DIPLOMES -->
@@ -74,6 +80,9 @@
         </div>
       </div>
 
+      <!-- CHAMP CACHÉ POUR KKIAPAY -->
+      <input type="hidden" name="transactionId" id="transactionId" value="">
+
       <button type="submit" class="w-full py-4 bg-primary text-white rounded-xl font-bold hover:bg-red-700 transition-all transform active:scale-95 shadow-lg text-lg">
         Envoyer ma Candidature
       </button>
@@ -81,31 +90,67 @@
   </div>
 </div>
 
+<!-- SCRIPT KKIAPAY -->
+<div id="payment-data" data-key="<%= process.env.KKIA_PUBLIC_KEY || '' %>" class="hidden"></div>
 <script>
+  const KKIAPAY_PUBLIC_KEY = document.getElementById("payment-data").dataset.key;
+
   function toggleNewMemberFields() {
     const type = document.getElementById('member_type').value;
     const newFields = document.getElementById('new-member-fields');
+    const warningBox = document.getElementById('existing-warning');
     const trainerInput = document.getElementById('trainer_phone');
     
     if (type === 'new') {
       newFields.classList.remove('hidden');
+      warningBox.classList.add('hidden');
       trainerInput.setAttribute('required', 'required');
     } else {
       newFields.classList.add('hidden');
+      warningBox.classList.remove('hidden');
       trainerInput.removeAttribute('required');
     }
   }
+  // Initialiser l'affichage au chargement
+  toggleNewMemberFields();
 
   function updateAdhesionFee() {
     const isBohicon = document.getElementById('trainer_is_bohicon').value;
-    const feeDisplay = document.getElementById('fee_display');
-    
-    if (isBohicon === '1') {
-      feeDisplay.innerText = "5 000";
-    } else {
-      feeDisplay.innerText = "10 000";
-    }
+    document.getElementById('fee_display').innerText = isBohicon === '1' ? "5 000" : "10 000";
   }
+
+  // INTERCEPTION DU FORMULAIRE POUR KKIAPAY
+  document.getElementById('apply-form').addEventListener('submit', function(e) {
+    const memberType = document.getElementById('member_type').value;
+    const transactionId = document.getElementById('transactionId').value;
+
+    // Si c'est un nouveau membre ET qu'il n'a pas encore payé
+    if (memberType === 'new' && !transactionId) {
+      e.preventDefault(); // On bloque l'envoi du formulaire
+      
+      const isBohicon = document.getElementById('trainer_is_bohicon').value === '1';
+      const amount = isBohicon ? 5000 : 10000;
+
+      openKkiapayWidget({
+        amount: amount,
+        key: KKIAPAY_PUBLIC_KEY,
+        position: "center",
+        theme: "#dc2626",
+        sandbox: true // ⚠️ Mets "false" en production
+      });
+    }
+    // Si c'est un ancien membre, ou si on a déjà le transactionId, le formulaire s'envoie normalement
+  });
+
+  addKkiapayListener("success", function(response) {
+    // Une fois le paiement réussi, on remplit le champ caché et on soumet le formulaire
+    document.getElementById('transactionId').value = response.transactionId;
+    document.getElementById('apply-form').submit();
+  });
+
+  addKkiapayListener("failed", function(error) {
+    alert("Le paiement a échoué ou a été annulé. Veuillez réessayer.");
+  });
 </script>
 
 <%- include('partials/footer') %>

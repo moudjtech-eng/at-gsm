@@ -25,6 +25,11 @@
             <% if (a.member_type === 'new') { %>
               <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase mb-1 inline-block">Nouveau</span>
               <p class="text-xs text-slate-600">Frais: <strong class="text-primary"><%= a.adhesion_fee %> FCFA</strong></p>
+              <% if (a.transaction_ref) { %>
+                <p class="text-[10px] text-green-600 font-bold">✅ Payé via KkiaPay</p>
+              <% } else { %>
+                <p class="text-[10px] text-red-600 font-bold">❌ Paiement non effectué</p>
+              <% } %>
               <p class="text-[10px] text-slate-500">Formateur: <%= a.trainer_phone %> (<%= a.trainer_is_bohicon === 1 ? 'Bohicon' : 'Hors Bohicon' %>)</p>
             <% } else { %>
               <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Ancien membre</span>
